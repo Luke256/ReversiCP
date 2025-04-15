@@ -818,10 +818,10 @@
     <ClInclude Include="ReversiEngine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Main.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Game.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

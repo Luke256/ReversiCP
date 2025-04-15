@@ -54,8 +54,10 @@ void Game::draw() const
 		RectF{ pos, cellSize }.drawFrame();
 	}
 
-	FontAsset(U"bold")(U"{}"_fmt(engine.getNBlacks())).drawAt(64, { AppData::Width / 2 + 10 + UIW / 2, AppData::Height / 2 - 100 });
-	FontAsset(U"bold")(U"{}"_fmt(engine.getNWhites())).drawAt(64, { AppData::Width * 3 / 4 + 5 + UIW / 2, AppData::Height / 2 - 100 });
+	Circle{ AppData::Width / 2 + 10 + UIW / 2, AppData::Height / 2 - 50, 48 }.draw(Palette::Black);
+	Circle{ AppData::Width * 3 / 4 + 5 + UIW / 2, AppData::Height / 2 - 50, 48 }.draw(Palette::White);
+	FontAsset(U"bold")(U"{}"_fmt(engine.getNBlacks())).drawAt(64, { AppData::Width / 2 + 10 + UIW / 2, AppData::Height / 2 - 50 }, Palette::White);
+	FontAsset(U"bold")(U"{}"_fmt(engine.getNWhites())).drawAt(64, { AppData::Width * 3 / 4 + 5 + UIW / 2, AppData::Height / 2 - 50 }, Palette::Black);
 }
 
 void Game::reset()
