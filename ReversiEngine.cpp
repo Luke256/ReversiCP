@@ -21,12 +21,13 @@ namespace Reversi
 	{
 		m_blacks = pos2bit(4, 3) | pos2bit(3, 4);
 		m_whites = pos2bit(3, 3) | pos2bit(4, 4);
+		m_blackTurn = true;
 	}
 
-	uint64 ReversiEngine::getLegals() const
+	uint64 ReversiEngine::getLegals(bool inverseTurn) const
 	{
-		const uint64& playerBoard = m_blackTurn ? m_blacks : m_whites;
-		const uint64& oppBoard = m_blackTurn ? m_whites : m_blacks;
+		const uint64& playerBoard = (m_blackTurn ^ inverseTurn) ? m_blacks : m_whites;
+		const uint64& oppBoard = (m_blackTurn ^ inverseTurn) ? m_whites : m_blacks;
 		const uint64 hMask = 0x7e7e7e7e7e7e7e7e & oppBoard;
 		const uint64 vMask = 0x00FFFFFFFFFFFF00 & oppBoard;
 		const uint64 edgeMask = 0x007e7e7e7e7e7e00 & oppBoard;
@@ -170,6 +171,28 @@ namespace Reversi
 	void ReversiEngine::pass()
 	{
 		m_blackTurn = !m_blackTurn;
+	}
+
+	bool ReversiEngine::isBlackTurn() const
+	{
+		return m_blackTurn;
+	}
+
+	int32 ReversiEngine::getNBlacks() const
+	{
+		return std::popcount(m_blacks);
+	}
+
+	int32 ReversiEngine::getNWhites() const
+	{
+		return std::popcount(m_whites);
+	}
+
+	bool ReversiEngine::isFinished()
+	{
+		if (getLegals() != 0) return false;
+		if (getLegals(true) != 0) return false;
+		return true;
 	}
 
 	void bit2boad(const uint64& bit, Array<int32>& board)

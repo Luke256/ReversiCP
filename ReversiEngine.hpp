@@ -23,13 +23,21 @@ namespace Reversi
 
 		void reset();
 
-		uint64 getLegals() const;
+		uint64 getLegals(bool inverseTurn = false) const;
 
 		bool place(uint32 x, uint32 y);
 
 		void getBoard(Array<int32>& board) const;
 
 		void pass();
+
+		bool isBlackTurn() const;
+
+		int32 getNBlacks() const;
+
+		int32 getNWhites() const;
+
+		bool isFinished();
 	};
 
 	void bit2boad(const uint64& bit, Array<int32>& board);
