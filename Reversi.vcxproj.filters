@@ -824,5 +824,8 @@
     <ClInclude Include="Main.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Agent.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

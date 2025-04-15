@@ -75,7 +75,7 @@ void Game::updatePlayers()
 	if (engine.isFinished()) return;
 	if (not player.active) return;
 
-	auto pos = PlayerFunctions[*player.type.selectedItemIndex](subjectiveState, legals, isFirstFrame);
+	auto pos = PlayerFunctions[*player.type.selectedItemIndex](engine, isFirstFrame);
 	isFirstFrame = false;
 	if (not pos) return;
 
@@ -98,7 +98,7 @@ void Game::updatePlayers()
 }
 
 
-Optional<Point> updateHumanPlayer(const Array<int32>&, const Array<int32>&, bool)
+Optional<Point> updateHumanPlayer(const Reversi::ReversiEngine&, bool)
 {
 	const int32 boardW = AppData::Width / 2 - 20;
 	const int32 boardH = AppData::Width / 2 - 20;
@@ -118,12 +118,13 @@ Optional<Point> updateHumanPlayer(const Array<int32>&, const Array<int32>&, bool
 	return none;
 }
 
-Optional<Point> updateRandomPlayer(const Array<int32>&, const Array<int32>& legals, bool)
+Optional<Point> updateRandomPlayer(const Reversi::ReversiEngine& engine, bool)
 {
+	const auto legals = engine.getLegals();
 	Array<Point>legalPosList;
 	for (int32 i : step(64))
 	{
-		if (legals[i] == 0) continue;
+		if ((legals & (0x8000000000000000 >> i)) == 0) continue;
 		legalPosList << Point{ i % 8, i / 8 };
 	}
 	return Sample(legalPosList);

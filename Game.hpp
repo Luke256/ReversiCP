@@ -3,13 +3,37 @@
 # include "Main.hpp"
 # include "ReversiEngine.hpp"
 
-Optional<Point> updateHumanPlayer(const Array<int32>&, const Array<int32>&, bool);
-Optional<Point> updateRandomPlayer(const Array<int32>&, const Array<int32>& legals, bool);
+using _PlayFunc = std::function<Optional<Point>(const Reversi::ReversiEngine&, bool)>;
+
+Optional<Point> updateHumanPlayer(const Reversi::ReversiEngine&, bool);
+Optional<Point> updateRandomPlayer(const Reversi::ReversiEngine& engine, bool);
+
+template<class AgentType>
+_PlayFunc getAgentPlayer()
+{
+	auto agent_ptr = std::make_shared<AgentType>();
+	AsyncTask<Point> task;
+	auto F = [agent_ptr, task](const Reversi::ReversiEngine& engine, bool firstFime)
+		{
+			if (firstFime)
+			{
+				agent_ptr->reset();
+				task = Async(agent_ptr->play, engine);
+			}
+
+			if (task.isReady())
+			{
+				return task.get();
+			}
+			return none;
+		};
+
+	return F;
+}
 
 class Game : public MyApp::Scene
 {
 private:
-	using _PlayFunc = std::function<Optional<Point>(const Array<int32>&, const Array<int32>& , bool)>;
 	struct playerInfo
 	{
 		ListBoxState type;
@@ -42,5 +66,4 @@ public:
 	void draw() const override;
 	void reset();
 	void updatePlayers();
-
 };
