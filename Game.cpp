@@ -1,4 +1,14 @@
-﻿#include "Game.hpp"
+﻿# include "Game.hpp"
+
+# include "RandomAgent.hpp"
+# include "HumanAgent.hpp"
+
+void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
+{
+	agents << std::make_shared<HumanAgent>();
+	agents << std::make_shared<RandomAgent>();
+}
+
 
 Game::Game(const InitData& init):
 	IScene(init), boardState(64), legals(64)
@@ -8,7 +18,20 @@ Game::Game(const InitData& init):
 	p1Info.type.selectedItemIndex = 0;
 	p2Info.type.selectedItemIndex = 0;
 
+	genAgents(p1agents);
+	genAgents(p2agents);
+
 	reset();
+}
+
+Game::~Game()
+{
+	if (playTask.isValid())
+	{
+		p1agents[*p1Info.type.selectedItemIndex]->abort();
+		p2agents[*p2Info.type.selectedItemIndex]->abort();
+		playTask.wait();
+	}
 }
 
 void Game::update()
@@ -20,11 +43,21 @@ void Game::update()
 
 	if (SimpleGUI::ListBox(p1Info.type, { AppData::Width / 2 + 10, AppData::Height / 2 + 10 }, UIW, AppData::Height / 2 - 70))
 	{
-		p1Info.active = false;
+		p1Info.active = p1Info.type.selectedItemIndex == 0;
+		if (engine.isBlackTurn() and playTask.isValid())
+		{
+			for (auto& agent : p1agents) agent->abort();
+			playTask.wait();
+		}
 	}
 	if (SimpleGUI::ListBox(p2Info.type, { AppData::Width * 3 / 4 + 5, AppData::Height / 2 + 10 }, UIW, AppData::Height / 2 - 70))
 	{
-		p2Info.active = false;
+		p2Info.active = p2Info.type.selectedItemIndex == 0;
+		if (not engine.isBlackTurn() and playTask.isValid())
+		{
+			for (auto& agent : p2agents) agent->abort();
+			playTask.wait();
+		}
 	}
 
 	if (SimpleGUI::Button(p1Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width / 2 + 10, AppData::Height - 50 }, UIW))
@@ -86,17 +119,24 @@ void Game::updatePlayers()
 	if (isFirstFrame)
 	{
 		auto& agents_ptr = engine.isBlackTurn() ? p1agents : p2agents;
+		if (playTask.isValid())
+		{
+			agents_ptr[*player.type.selectedItemIndex]->abort();
+			playTask.wait();
+		}
 		auto F = [&]() -> Point
 			{
 				return agents_ptr[*player.type.selectedItemIndex]->play(engine);
 			};
 		playTask = Async(F);
+		isFirstFrame = false;
 	}
 
 	if (not playTask.isReady()) return;
 
+	isFirstFrame = true;
+
 	Point pos = playTask.get();
-	isFirstFrame = false;
 
 	bool executed = engine.place(pos.x, pos.y);
 	if (not executed) return;
@@ -113,38 +153,4 @@ void Game::updatePlayers()
 	{
 		for (auto i : step(64)) subjectiveState[i] *= -1;
 	}
-	isFirstFrame = true;
-}
-
-
-Optional<Point> updateHumanPlayer(const Reversi::ReversiEngine&, bool)
-{
-	const int32 boardW = AppData::Width / 2 - 20;
-	const int32 boardH = AppData::Width / 2 - 20;
-	constexpr int32 boardSize = Min(boardW, boardH);
-	const double cellSize = boardSize / 8.0;
-	const Vec2 boardCenter{ AppData::Width / 4, AppData::Height / 2 };
-	for (int32 i : step(64))
-	{
-		Vec2 pos{ boardCenter.x - boardSize / 2 + cellSize * (i % 8), boardCenter.y - boardSize / 2 + cellSize * (i / 8) };
-		RectF region{ pos, cellSize };
-
-		if (region.leftClicked())
-		{
-			return Point{ i % 8, i / 8 };
-		}
-	}
-	return none;
-}
-
-Optional<Point> updateRandomPlayer(const Reversi::ReversiEngine& engine, bool)
-{
-	const auto legals = engine.getLegals();
-	Array<Point>legalPosList;
-	for (int32 i : step(64))
-	{
-		if ((legals & (0x8000000000000000 >> i)) == 0) continue;
-		legalPosList << Point{ i % 8, i / 8 };
-	}
-	return Sample(legalPosList);
 }

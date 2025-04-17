@@ -328,7 +328,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Agent.hpp" />
-    <ClInclude Include="AgentRandom.hpp" />
+    <ClInclude Include="HumanAgent.hpp" />
+    <ClInclude Include="RandomAgent.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="ReversiEngine.hpp" />

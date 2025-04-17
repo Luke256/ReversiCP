@@ -2,12 +2,9 @@
 
 # include "Main.hpp"
 # include "ReversiEngine.hpp"
-# include "AgentRandom.hpp"
+# include "Agent.hpp"
 
-void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
-{
-	agents << std::make_shared<RandomAgent>();
-}
+void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents);
 
 class Game : public MyApp::Scene
 {
@@ -19,7 +16,7 @@ private:
 	};
 
 	const Array<String> PlayerTypes = {
-		//U"Human",
+		U"Human",
 		U"Random",
 	};
 
@@ -40,6 +37,7 @@ private:
 
 public:
 	Game(const InitData& init);
+	~Game();
 	void update() override;
 	void draw() const override;
 	void reset();
