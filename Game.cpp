@@ -30,10 +30,18 @@ void Game::update()
 	if (SimpleGUI::Button(p1Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width / 2 + 10, AppData::Height - 50 }, UIW))
 	{
 		p1Info.active = !p1Info.active;
+		if (engine.isBlackTurn())
+		{
+			isFirstFrame = true;
+		}
 	}
 	if (SimpleGUI::Button(p2Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width * 3 / 4 + 5, AppData::Height - 50 }, UIW))
 	{
 		p2Info.active = !p2Info.active;
+		if (not engine.isBlackTurn())
+		{
+			isFirstFrame = true;
+		}
 	}
 	if (SimpleGUI::Button(U"Reset", {AppData::Width / 2 + 10,10}, UIW * 2 + 10))
 	{
@@ -75,11 +83,22 @@ void Game::updatePlayers()
 	if (engine.isFinished()) return;
 	if (not player.active) return;
 
-	auto pos = PlayerFunctions[*player.type.selectedItemIndex](engine, isFirstFrame);
-	isFirstFrame = false;
-	if (not pos) return;
+	if (isFirstFrame)
+	{
+		auto& agents_ptr = engine.isBlackTurn() ? p1agents : p2agents;
+		auto F = [&]() -> Point
+			{
+				return agents_ptr[*player.type.selectedItemIndex]->play(engine);
+			};
+		playTask = Async(F);
+	}
 
-	bool executed = engine.place(pos->x, pos->y);
+	if (not playTask.isReady()) return;
+
+	Point pos = playTask.get();
+	isFirstFrame = false;
+
+	bool executed = engine.place(pos.x, pos.y);
 	if (not executed) return;
 
 	if (engine.getLegals() == 0ll)
