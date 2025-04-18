@@ -48,7 +48,9 @@ void Game::update()
 		{
 			for (auto& agent : p1agents) agent->abort();
 			playTask.wait();
+			playTask.get();
 		}
+		isFirstFrame = true;
 	}
 	if (SimpleGUI::ListBox(p2Info.type, { AppData::Width * 3 / 4 + 5, AppData::Height / 2 + 10 }, UIW, AppData::Height / 2 - 70))
 	{
@@ -57,7 +59,9 @@ void Game::update()
 		{
 			for (auto& agent : p2agents) agent->abort();
 			playTask.wait();
+			playTask.get();
 		}
+		isFirstFrame = true;
 	}
 
 	if (SimpleGUI::Button(p1Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width / 2 + 10, AppData::Height - 50 }, UIW))
@@ -121,13 +125,16 @@ void Game::updatePlayers()
 		auto& agents_ptr = engine.isBlackTurn() ? p1agents : p2agents;
 		if (playTask.isValid())
 		{
-			agents_ptr[*player.type.selectedItemIndex]->abort();
+			for (auto& agent : p1agents) agent->abort();
+			for (auto& agent : p2agents) agent->abort();
 			playTask.wait();
+			playTask.get();
 		}
 		auto F = [&]() -> Point
 			{
 				return agents_ptr[*player.type.selectedItemIndex]->play(engine);
 			};
+		agents_ptr[*player.type.selectedItemIndex]->reset();
 		playTask = Async(F);
 		isFirstFrame = false;
 	}

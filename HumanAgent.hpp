@@ -38,5 +38,5 @@ public:
 		else return Point{ 0,0 };
 	}
 
-	void reset() override {}
+	void reset_child() override {}
 };

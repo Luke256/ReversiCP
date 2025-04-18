@@ -22,5 +22,5 @@ public:
 		int32 p = Sample(legals);
 		return Point{ p % 8, p / 8 };
 	}
-	void reset() override {}
+	void reset_child() override {}
 };
