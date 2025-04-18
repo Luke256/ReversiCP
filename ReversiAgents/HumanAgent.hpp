@@ -1,6 +1,6 @@
 ﻿# pragma once
 # include "Agent.hpp"
-# include "Main.hpp"
+# include "../Main.hpp"
 
 class HumanAgent : public ReversiAgent
 {

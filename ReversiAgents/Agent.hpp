@@ -1,5 +1,5 @@
 ﻿# pragma once
-# include "ReversiEngine.hpp"
+# include "../ReversiEngine.hpp"
 
 class ReversiAgent
 {
@@ -7,7 +7,8 @@ private:
 	bool m_abort;
 public:
 	ReversiAgent(): m_abort(false)
-	{}
+	{
+	}
 	virtual Point play(const Reversi::ReversiEngine &engine) = 0;
 	virtual void reset_child() = 0;
 	void reset()

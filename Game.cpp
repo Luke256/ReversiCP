@@ -1,12 +1,14 @@
 ﻿# include "Game.hpp"
 
-# include "RandomAgent.hpp"
-# include "HumanAgent.hpp"
+# include "ReversiAgents/RandomAgent.hpp"
+# include "ReversiAgents/HumanAgent.hpp"
+# include "ReversiAgents/GreedyAgent.hpp"
 
 void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
 {
 	agents << std::make_shared<HumanAgent>();
 	agents << std::make_shared<RandomAgent>();
+	agents << std::make_shared<GreedyAgent>();
 }
 
 

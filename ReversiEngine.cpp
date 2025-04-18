@@ -173,6 +173,19 @@ namespace Reversi
 		m_blackTurn = !m_blackTurn;
 	}
 
+	void ReversiEngine::setState(uint64 blacks, uint64 whites, bool blackTurn)
+	{
+		m_blacks = blacks;
+		m_whites = whites;
+		m_blackTurn = blackTurn;
+	}
+
+	void ReversiEngine::swapBW()
+	{
+		std::swap(m_blacks, m_whites);
+		m_blackTurn = !m_blackTurn;
+	}
+
 	bool ReversiEngine::isBlackTurn() const
 	{
 		return m_blackTurn;
@@ -186,6 +199,16 @@ namespace Reversi
 	int32 ReversiEngine::getNWhites() const
 	{
 		return std::popcount(m_whites);
+	}
+
+	uint64 ReversiEngine::getBlacks() const
+	{
+		return m_blacks;
+	}
+
+	uint64 ReversiEngine::getWhites() const
+	{
+		return m_whites;
 	}
 
 	bool ReversiEngine::isFinished()

@@ -136,6 +136,9 @@
     <Filter Include="Resource Files\engine\font\min">
       <UniqueIdentifier>{1b103960-f11a-4515-b4f1-f59333ce00d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ReversiAgents">
+      <UniqueIdentifier>{64203944-2a62-4490-a6b5-0f1b7ff2cc5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -149,6 +152,9 @@
     </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReversiAgents\GreedyAgent.cpp">
+      <Filter>ReversiAgents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -824,14 +830,17 @@
     <ClInclude Include="Main.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Agent.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ReversiAgents\Agent.hpp">
+      <Filter>ReversiAgents</Filter>
     </ClInclude>
-    <ClInclude Include="RandomAgent.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ReversiAgents\HumanAgent.hpp">
+      <Filter>ReversiAgents</Filter>
     </ClInclude>
-    <ClInclude Include="HumanAgent.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ReversiAgents\RandomAgent.hpp">
+      <Filter>ReversiAgents</Filter>
+    </ClInclude>
+    <ClInclude Include="ReversiAgents\GreedyAgent.hpp">
+      <Filter>ReversiAgents</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

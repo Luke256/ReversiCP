@@ -31,11 +31,19 @@ namespace Reversi
 
 		void pass();
 
+		void setState(uint64 blacks, uint64 whites, bool blackTurn);
+
+		void swapBW();
+
 		bool isBlackTurn() const;
 
 		int32 getNBlacks() const;
 
 		int32 getNWhites() const;
+
+		uint64 getBlacks() const;
+
+		uint64 getWhites() const;
 
 		bool isFinished();
 	};

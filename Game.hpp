@@ -2,7 +2,7 @@
 
 # include "Main.hpp"
 # include "ReversiEngine.hpp"
-# include "Agent.hpp"
+# include "ReversiAgents/Agent.hpp"
 
 void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents);
 
@@ -18,6 +18,7 @@ private:
 	const Array<String> PlayerTypes = {
 		U"Human",
 		U"Random",
+		U"Greedy",
 	};
 
 	const int32 boardW = AppData::Width / 2 - 20;

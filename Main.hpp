@@ -1,5 +1,5 @@
 ﻿#pragma once
-# include <Siv3D.hpp>
+# include <Siv3D.hpp> // OpenSiv3D v0.6.15
 
 struct GameData
 {
