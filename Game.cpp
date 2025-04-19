@@ -15,7 +15,7 @@ void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
 
 
 Game::Game(const InitData& init):
-	IScene(init), boardState(64), legals(64)
+	IScene(init), boardState(64), legals(64), runningStats(false)
 {
 	p1Info.type = ListBoxState{ PlayerTypes };
 	p2Info.type = ListBoxState{ PlayerTypes };
@@ -44,49 +44,12 @@ void Game::update()
 	updatePlayers();
 
 	// UI
+	updateUIs();
 
-	if (SimpleGUI::ListBox(p1Info.type, { AppData::Width / 2 + 10, AppData::Height / 2 + 10 }, UIW, AppData::Height / 2 - 70))
+	// Stats
+	if (runningStats)
 	{
-		p1Info.active = p1Info.type.selectedItemIndex == 0;
-		if (engine.isBlackTurn() and playTask.isValid())
-		{
-			for (auto& agent : p1agents) agent->abort();
-			playTask.wait();
-			playTask.get();
-		}
-		isFirstFrame = true;
-	}
-	if (SimpleGUI::ListBox(p2Info.type, { AppData::Width * 3 / 4 + 5, AppData::Height / 2 + 10 }, UIW, AppData::Height / 2 - 70))
-	{
-		p2Info.active = p2Info.type.selectedItemIndex == 0;
-		if (not engine.isBlackTurn() and playTask.isValid())
-		{
-			for (auto& agent : p2agents) agent->abort();
-			playTask.wait();
-			playTask.get();
-		}
-		isFirstFrame = true;
-	}
-
-	if (SimpleGUI::Button(p1Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width / 2 + 10, AppData::Height - 50 }, UIW))
-	{
-		p1Info.active = !p1Info.active;
-		if (engine.isBlackTurn())
-		{
-			isFirstFrame = true;
-		}
-	}
-	if (SimpleGUI::Button(p2Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width * 3 / 4 + 5, AppData::Height - 50 }, UIW))
-	{
-		p2Info.active = !p2Info.active;
-		if (not engine.isBlackTurn())
-		{
-			isFirstFrame = true;
-		}
-	}
-	if (SimpleGUI::Button(U"Reset", {AppData::Width / 2 + 10,10}, UIW * 2 + 10))
-	{
-		reset();
+		updateStats();
 	}
 }
 
@@ -103,10 +66,19 @@ void Game::draw() const
 		RectF{ pos, cellSize }.drawFrame();
 	}
 
-	Circle{ AppData::Width / 2 + 10 + UIW / 2, AppData::Height / 2 - 50, 48 }.draw(Palette::Black);
-	Circle{ AppData::Width * 3 / 4 + 5 + UIW / 2, AppData::Height / 2 - 50, 48 }.draw(Palette::White);
+	Circle{ AppData::Width / 2 + 10 + UIW / 2, AppData::Height / 2 - 50, 48 }.draw(Palette::Black).drawFrame(0, 3 * engine.isBlackTurn(), Palette::Orange);
+	Circle{ AppData::Width * 3 / 4 + 5 + UIW / 2, AppData::Height / 2 - 50, 48 }.draw(Palette::White).drawFrame(0, 3 * (not engine.isBlackTurn()), Palette::Orange);
 	FontAsset(U"bold")(U"{}"_fmt(engine.getNBlacks())).drawAt(64, { AppData::Width / 2 + 10 + UIW / 2, AppData::Height / 2 - 50 }, Palette::White);
 	FontAsset(U"bold")(U"{}"_fmt(engine.getNWhites())).drawAt(64, { AppData::Width * 3 / 4 + 5 + UIW / 2, AppData::Height / 2 - 50 }, Palette::Black);
+
+	{
+		const auto t = Transformer2D(Mat3x2::Translate(AppData::Width / 2, 120));
+		const int32 width = AppData::Width / 2;
+		FontAsset(U"bold")(U"対局数: {}"_fmt(gameStats.games)).drawAt(width / 2, 30, ColorF{ 0.1 });
+		FontAsset(U"bold")(U"黒: {}"_fmt(gameStats.p1Wins)).drawAt(width / 4, 100, ColorF{ 0.1 });
+		FontAsset(U"bold")(U"分: {}"_fmt(gameStats.draws)).drawAt(width / 2, 100, ColorF{ 0.1 });
+		FontAsset(U"bold")(U"白: {}"_fmt(gameStats.p2Wins)).drawAt(width * 3 / 4, 100, ColorF{ 0.1 });
+	}
 }
 
 void Game::reset()
@@ -163,5 +135,88 @@ void Game::updatePlayers()
 	if (not engine.isBlackTurn())
 	{
 		for (auto i : step(64)) subjectiveState[i] *= -1;
+	}
+}
+
+void Game::updateUIs()
+{
+
+	if (SimpleGUI::ListBox(p1Info.type, { AppData::Width / 2 + 10, AppData::Height / 2 + 10 }, UIW, AppData::Height / 2 - 70))
+	{
+		p1Info.active = p1Info.type.selectedItemIndex == 0;
+		if (engine.isBlackTurn() and playTask.isValid())
+		{
+			for (auto& agent : p1agents) agent->abort();
+			playTask.wait();
+			playTask.get();
+		}
+		isFirstFrame = true;
+	}
+	if (SimpleGUI::ListBox(p2Info.type, { AppData::Width * 3 / 4 + 5, AppData::Height / 2 + 10 }, UIW, AppData::Height / 2 - 70))
+	{
+		p2Info.active = p2Info.type.selectedItemIndex == 0;
+		if (not engine.isBlackTurn() and playTask.isValid())
+		{
+			for (auto& agent : p2agents) agent->abort();
+			playTask.wait();
+			playTask.get();
+		}
+		isFirstFrame = true;
+	}
+
+	if (SimpleGUI::Button(p1Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width / 2 + 10, AppData::Height - 50 }, UIW))
+	{
+		p1Info.active = !p1Info.active;
+		if (engine.isBlackTurn())
+		{
+			isFirstFrame = true;
+		}
+	}
+	if (SimpleGUI::Button(p2Info.active ? U"\U000F03E4" : U"\U000F040A", { AppData::Width * 3 / 4 + 5, AppData::Height - 50 }, UIW))
+	{
+		p2Info.active = !p2Info.active;
+		if (not engine.isBlackTurn())
+		{
+			isFirstFrame = true;
+		}
+	}
+	if (SimpleGUI::Button(U"Reset", { AppData::Width / 2 + 10,10 }, UIW * 2 + 10, not runningStats))
+	{
+		reset();
+	}
+	if (SimpleGUI::Button(runningStats ? U"Stop Stats" : U"Run Stats", { AppData::Width / 2 + 10, 60 }, UIW))
+	{
+		runningStats = !runningStats;
+		if (runningStats)
+		{
+			reset();
+			p1Info.active = true;
+			p2Info.active = true;
+		}
+		else
+		{
+			p1Info.active = false;
+			p2Info.active = false;
+		}
+	}
+	if (SimpleGUI::Button(U"Reset Stats", { AppData::Width * 3 / 4 + 5, 60 }, UIW))
+	{
+		gameStats.reset();
+	}
+}
+
+void Game::updateStats()
+{
+	if (engine.isFinished())
+	{
+		const int32 blacks = engine.getNBlacks();
+		const int32 whites = engine.getNWhites();
+
+		gameStats.games++;
+		if (blacks > whites) gameStats.p1Wins++;
+		if (blacks < whites) gameStats.p2Wins++;
+		if (blacks == whites) gameStats.draws++;
+
+		reset();
 	}
 }

@@ -15,6 +15,12 @@ private:
 		bool active = true;
 	};
 
+	struct Statistics
+	{
+		int32 games = 0, p1Wins = 0, p2Wins = 0, draws = 0;
+		void reset() { games = p1Wins = p2Wins = draws = 0; }
+	};
+
 	const Array<String> PlayerTypes = {
 		U"Human",
 		U"Random",
@@ -37,6 +43,9 @@ private:
 	bool isFirstFrame;
 	AsyncTask<Point> playTask;
 
+	Statistics gameStats;
+	bool runningStats;
+
 public:
 	Game(const InitData& init);
 	~Game();
@@ -44,4 +53,6 @@ public:
 	void draw() const override;
 	void reset();
 	void updatePlayers();
+	void updateUIs();
+	void updateStats();
 };
