@@ -118,6 +118,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ReversiAgents\GreedyAgent.cpp" />
+    <ClCompile Include="ReversiAgents\MinMaxAgent.cpp" />
     <ClCompile Include="ReversiEngine.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -333,6 +334,7 @@
     <ClInclude Include="ReversiAgents\Agent.hpp" />
     <ClInclude Include="ReversiAgents\HumanAgent.hpp" />
     <ClInclude Include="ReversiAgents\GreedyAgent.hpp" />
+    <ClInclude Include="ReversiAgents\MinMaxAgent.hpp" />
     <ClInclude Include="ReversiAgents\RandomAgent.hpp" />
     <ClInclude Include="ReversiEngine.hpp" />
     <ClInclude Include="stdafx.h" />

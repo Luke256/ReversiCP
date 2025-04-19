@@ -3,12 +3,14 @@
 # include "ReversiAgents/RandomAgent.hpp"
 # include "ReversiAgents/HumanAgent.hpp"
 # include "ReversiAgents/GreedyAgent.hpp"
+# include "ReversiAgents/MinMaxAgent.hpp"
 
 void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
 {
 	agents << std::make_shared<HumanAgent>();
 	agents << std::make_shared<RandomAgent>();
 	agents << std::make_shared<GreedyAgent>();
+	agents << std::make_shared<MinMaxAgent>();
 }
 
 

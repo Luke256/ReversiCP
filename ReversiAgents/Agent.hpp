@@ -22,5 +22,6 @@ public:
 		m_abort = true;
 	}
 protected:
+	const int32 inf = 1000000;
 	bool isAborted() { return m_abort; }
 };
