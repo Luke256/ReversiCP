@@ -4,6 +4,7 @@
 # include "ReversiAgents/HumanAgent.hpp"
 # include "ReversiAgents/GreedyAgent.hpp"
 # include "ReversiAgents/MinMaxAgent.hpp"
+# include "ReversiAgents/AlphaBetaAgent.hpp"
 
 void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
 {
@@ -11,6 +12,7 @@ void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
 	agents << std::make_shared<RandomAgent>();
 	agents << std::make_shared<GreedyAgent>();
 	agents << std::make_shared<MinMaxAgent>();
+	agents << std::make_shared<AlphaBetaAgent>();
 }
 
 

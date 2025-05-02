@@ -2,10 +2,10 @@
 
 # include "Agent.hpp"
 
-class MinMaxAgent : public ReversiAgent
+class AlphaBetaAgent : public ReversiAgent
 {
 public:
-	MinMaxAgent();
+	AlphaBetaAgent();
 	Point play(const Reversi::ReversiEngine& engine) override;
 	void reset_child() override;
 private:
@@ -41,9 +41,10 @@ private:
 		return res;
 	}
 
-	int32 negaMax(Reversi::ReversiEngine& engine, int32 depth, bool passed);
+	int32 negaAlpha(Reversi::ReversiEngine& engine, int32 depth, bool passed, int32 alpha, int32 beta);
 
 	inline int32 eval(const Reversi::ReversiEngine& engine) const;
 
 	int32 callCnt;
+	HashTable<std::tuple<uint64, uint64, bool>, int32> transTable;
 };

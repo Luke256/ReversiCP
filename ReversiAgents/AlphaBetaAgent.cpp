@@ -1,11 +1,11 @@
-﻿#include "MinMaxAgent.hpp"
+﻿#include "AlphaBetaAgent.hpp"
 
-MinMaxAgent::MinMaxAgent()
+AlphaBetaAgent::AlphaBetaAgent()
 {
 
 }
 
-Point MinMaxAgent::play(const Reversi::ReversiEngine& engine)
+Point AlphaBetaAgent::play(const Reversi::ReversiEngine& engine)
 {
 	callCnt = 0;
 	Reversi::ReversiEngine env = engine;
@@ -14,7 +14,7 @@ Point MinMaxAgent::play(const Reversi::ReversiEngine& engine)
 	const uint64 prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
 
 	uint64 mask = 0x8000000000000000;
-	int32 maxScore = -inf, best = -1, score;
+	int32 best = -1, score, alpha = -inf, beta = inf;
 	for (int32 i : step(64))
 	{
 		if (not (legals & mask))
@@ -23,12 +23,14 @@ Point MinMaxAgent::play(const Reversi::ReversiEngine& engine)
 			continue;
 		}
 		env.place(i % 8, i / 8);
-		score = -negaMax(env, 3, false);
-		if (score > maxScore)
+		score = -negaAlpha(env, 6, false, -beta, -alpha);
+
+		if (alpha < score)
 		{
-			maxScore = score;
+			alpha = score;
 			best = i;
 		}
+
 		env.setState(prevBlacks, prevWhites, true);
 		mask >>= 1;
 	}
@@ -36,38 +38,48 @@ Point MinMaxAgent::play(const Reversi::ReversiEngine& engine)
 	return Point{ best % 8, best / 8 };
 }
 
-void MinMaxAgent::reset_child()
+void AlphaBetaAgent::reset_child()
 {
 }
 
-int32 MinMaxAgent::negaMax(Reversi::ReversiEngine& engine, int32 depth, bool passed)
+int32 AlphaBetaAgent::negaAlpha(Reversi::ReversiEngine& engine, int32 depth, bool passed, int32 alpha, int32 beta)
 {
 	callCnt++;
 	if (depth == 0) return eval(engine);
+	if (transTable.contains(engine.getTupleState())) return transTable[engine.getTupleState()];
+
 	const uint64 legals = engine.getLegals(), prevBlacks = engine.getBlacks(), prevWhites = engine.getWhites();
-	const bool prevBlackTurn = engine.isBlackTurn();
 	uint64 mask = 0x8000000000000000;
-	int32 maxScore = -inf;
+	const bool prevBlackTurn = engine.isBlackTurn();
+	int32 maxScore = -inf, g = 0;
 	for (int32 i : step(64))
 	{
-		if (not (legals & mask)) continue;
-		engine.place(i % 8, i / 8);
-		maxScore = Max(maxScore, -negaMax(engine, depth - 1, false));
+		if (not (legals & mask))
+		{
+			mask >>= 1;
+			continue;
+		}
+		engine.place(i & 7, i >> 3);
+		g = -negaAlpha(engine, depth - 1, false, -beta, -alpha);
+		if (g >= beta) return g;
+		alpha = Max(alpha, g);
+		maxScore = Max(maxScore, g);
 		engine.setState(prevBlacks, prevWhites, prevBlackTurn);
+		mask >>= 1;
 	}
 
-	if (maxScore != -inf) return maxScore; // 操作をした
+	if (maxScore != -inf) return transTable[engine.getTupleState()] = maxScore; // 操作をした
 
-	if (passed) return eval(engine); // パスの連続
+	if (passed) return transTable[engine.getTupleState()] = eval(engine); // パスの連続
 
 	// 初回のパス
 	engine.pass();
-	maxScore = -negaMax(engine, depth - 1, true);
+	maxScore = -negaAlpha(engine, depth - 1, true, -beta, -alpha);
 	engine.pass();
-	return maxScore;
+	return transTable[engine.getTupleState()] = maxScore;
 }
 
-inline int32 MinMaxAgent::eval(const Reversi::ReversiEngine& engine) const
+inline int32 AlphaBetaAgent::eval(const Reversi::ReversiEngine& engine) const
 {
 	uint64 black = engine.getBlacks(), white = engine.getWhites();
 	int32 score = 0;

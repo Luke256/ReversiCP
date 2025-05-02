@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="ReversiAgents\AlphaBetaAgent.cpp" />
     <ClCompile Include="ReversiAgents\GreedyAgent.cpp" />
     <ClCompile Include="ReversiAgents\MinMaxAgent.cpp" />
     <ClCompile Include="ReversiEngine.cpp" />
@@ -332,6 +333,7 @@
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="ReversiAgents\Agent.hpp" />
+    <ClInclude Include="ReversiAgents\AlphaBetaAgent.hpp" />
     <ClInclude Include="ReversiAgents\HumanAgent.hpp" />
     <ClInclude Include="ReversiAgents\GreedyAgent.hpp" />
     <ClInclude Include="ReversiAgents\MinMaxAgent.hpp" />

@@ -46,6 +46,11 @@ namespace Reversi
 		uint64 getWhites() const;
 
 		bool isFinished();
+
+		inline std::tuple<uint64, uint64, bool> getTupleState() const
+		{
+			return { m_blacks, m_whites, m_blackTurn };
+		}
 	};
 
 	void bit2boad(const uint64& bit, Array<int32>& board);
