@@ -6,10 +6,12 @@ class ReversiAgent
 private:
 	bool m_abort;
 public:
+	using Pos = std::pair<int32_t, int32_t>;
+
 	ReversiAgent(): m_abort(false)
 	{
 	}
-	virtual Point play(const Reversi::ReversiEngine &engine) = 0;
+	virtual Pos play(const Reversi::ReversiEngine &engine) = 0;
 	virtual void reset_child() = 0;
 	void reset()
 	{
@@ -22,6 +24,6 @@ public:
 		m_abort = true;
 	}
 protected:
-	const int32 inf = 1000000;
+	const int32_t inf = 1000000;
 	bool isAborted() { return m_abort; }
 };

@@ -5,7 +5,7 @@ MinMaxAgent::MinMaxAgent()
 
 }
 
-Point MinMaxAgent::play(const Reversi::ReversiEngine& engine)
+MinMaxAgent::Pos MinMaxAgent::play(const Reversi::ReversiEngine& engine)
 {
 	callCnt = 0;
 	Reversi::ReversiEngine env = engine;
@@ -33,7 +33,7 @@ Point MinMaxAgent::play(const Reversi::ReversiEngine& engine)
 		mask >>= 1;
 	}
 	Console << U"AlphaBeta: " << callCnt << U" calls.";
-	return Point{ best % 8, best / 8 };
+	return { best % 8, best / 8 };
 }
 
 void MinMaxAgent::reset_child()

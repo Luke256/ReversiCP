@@ -5,18 +5,18 @@ AlphaBetaAgent::AlphaBetaAgent()
 
 }
 
-Point AlphaBetaAgent::play(const Reversi::ReversiEngine& engine)
+AlphaBetaAgent::Pos AlphaBetaAgent::play(const Reversi::ReversiEngine& engine)
 {
 	callCnt = 0;
 	Reversi::ReversiEngine env = engine;
 	if (not env.isBlackTurn()) env.swapBW(); // 黒を扱いたい
-	const uint64 prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
-	const int32 SEARCH_DEPTH = 6;
+	const uint64_t prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
+	const int32_t SEARCH_DEPTH = 6;
 
-	int32 best = -1, score, alpha = -inf, beta = inf;
-	Array<LegalState> legals;
+	int32_t best = -1, score, alpha = -inf, beta = inf;
+	std::vector<LegalState> legals;
 
-	for (int32 depth : step(SEARCH_DEPTH))
+	for (int32_t depth : step(SEARCH_DEPTH))
 	{
 		if (isAborted()) break;
 		alpha = -inf, beta = inf;
@@ -40,24 +40,24 @@ Point AlphaBetaAgent::play(const Reversi::ReversiEngine& engine)
 		transTable.clear();
 	}
 	Console << U"AlphaBeta: " << callCnt << U" calls.";
-	return Point{ best & 7, best >> 3 };
+	return { best & 7, best >> 3 };
 }
 
 void AlphaBetaAgent::reset_child()
 {
 }
 
-int32 AlphaBetaAgent::negaAlpha(Reversi::ReversiEngine& engine, int32 depth, bool passed, int32 alpha, int32 beta)
+int32_t AlphaBetaAgent::negaAlpha(Reversi::ReversiEngine& engine, int32_t depth, bool passed, int32_t alpha, int32_t beta)
 {
 	callCnt++;
 	if (depth == 0) return eval(engine);
 	if (transTable.contains(engine.getTupleState())) return transTable[engine.getTupleState()];
 
-	const uint64 prevBlacks = engine.getBlacks(), prevWhites = engine.getWhites();
+	const uint64_t prevBlacks = engine.getBlacks(), prevWhites = engine.getWhites();
 	const bool prevBlackTurn = engine.isBlackTurn();
-	int32 maxScore = -inf, g = 0;
+	int32_t maxScore = -inf, g = 0;
 
-	Array<LegalState> legals;
+	std::vector<LegalState> legals;
 	getSortedLegals(engine, legals);
 
 	for (auto [v, idx] : legals)
@@ -81,26 +81,26 @@ int32 AlphaBetaAgent::negaAlpha(Reversi::ReversiEngine& engine, int32 depth, boo
 	return transTable[engine.getTupleState()] = maxScore;
 }
 
-inline int32 AlphaBetaAgent::eval(const Reversi::ReversiEngine& engine) const
+inline int32_t AlphaBetaAgent::eval(const Reversi::ReversiEngine& engine) const
 {
-	uint64 black = engine.getBlacks(), white = engine.getWhites();
-	int32 score = 0;
-	score += rowValues[0][(black & 0xFF00000000000000) >> 56];
-	score += rowValues[1][(black & 0x00FF000000000000) >> 48];
-	score += rowValues[2][(black & 0x0000FF0000000000) >> 40];
-	score += rowValues[3][(black & 0x000000FF00000000) >> 32];
-	score += rowValues[4][(black & 0x00000000FF000000) >> 24];
-	score += rowValues[5][(black & 0x0000000000FF0000) >> 16];
-	score += rowValues[6][(black & 0x000000000000FF00) >> 8];
-	score += rowValues[7][(black & 0x00000000000000FF)];
-	score -= rowValues[0][(white & 0xFF00000000000000) >> 56];
-	score -= rowValues[1][(white & 0x00FF000000000000) >> 48];
-	score -= rowValues[2][(white & 0x0000FF0000000000) >> 40];
-	score -= rowValues[3][(white & 0x000000FF00000000) >> 32];
-	score -= rowValues[4][(white & 0x00000000FF000000) >> 24];
-	score -= rowValues[5][(white & 0x0000000000FF0000) >> 16];
-	score -= rowValues[6][(white & 0x000000000000FF00) >> 8];
-	score -= rowValues[7][(white & 0x00000000000000FF)];
+	uint64_t black = engine.getBlacks(), white = engine.getWhites();
+	int32_t score = 0;
+	score += rowValues[(0 << 8) + ((black & 0xFF00000000000000) >> 56)];
+	score += rowValues[(1 << 8) + ((black & 0x00FF000000000000) >> 48)];
+	score += rowValues[(2 << 8) + ((black & 0x0000FF0000000000) >> 40)];
+	score += rowValues[(3 << 8) + ((black & 0x000000FF00000000) >> 32)];
+	score += rowValues[(4 << 8) + ((black & 0x00000000FF000000) >> 24)];
+	score += rowValues[(5 << 8) + ((black & 0x0000000000FF0000) >> 16)];
+	score += rowValues[(6 << 8) + ((black & 0x000000000000FF00) >> 8)];
+	score += rowValues[(7 << 8) + ((black & 0x00000000000000FF))];
+	score -= rowValues[(0 << 8) + ((white & 0xFF00000000000000) >> 56)];
+	score -= rowValues[(1 << 8) + ((white & 0x00FF000000000000) >> 48)];
+	score -= rowValues[(2 << 8) + ((white & 0x0000FF0000000000) >> 40)];
+	score -= rowValues[(3 << 8) + ((white & 0x000000FF00000000) >> 32)];
+	score -= rowValues[(4 << 8) + ((white & 0x00000000FF000000) >> 24)];
+	score -= rowValues[(5 << 8) + ((white & 0x0000000000FF0000) >> 16)];
+	score -= rowValues[(6 << 8) + ((white & 0x000000000000FF00) >> 8)];
+	score -= rowValues[(7 << 8) + ((white & 0x00000000000000FF))];
 
 	if (not engine.isBlackTurn()) score = -score;
 	if (score > 0) // 四捨五入のため

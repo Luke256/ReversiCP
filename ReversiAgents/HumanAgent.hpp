@@ -5,37 +5,37 @@
 class HumanAgent : public ReversiAgent
 {
 private:
-	Optional<Point> playStep()
+	Optional<Pos> playStep()
 	{
-		const int32 boardW = AppData::Width / 2 - 20;
-		const int32 boardH = AppData::Width / 2 - 20;
-		constexpr int32 boardSize = Min(boardW, boardH);
+		const int32_t boardW = AppData::Width / 2 - 20;
+		const int32_t boardH = AppData::Width / 2 - 20;
+		constexpr int32_t boardSize = Min(boardW, boardH);
 		const double cellSize = boardSize / 8.0;
 		const Vec2 boardCenter{ AppData::Width / 4, AppData::Height / 2 };
-		for (int32 i : step(64))
+		for (int32_t i : step(64))
 		{
 			Vec2 pos{ boardCenter.x - boardSize / 2 + cellSize * (i % 8), boardCenter.y - boardSize / 2 + cellSize * (i / 8) };
 			RectF region{ pos, cellSize };
 
 			if (region.leftClicked())
 			{
-				return Point{ i % 8, i / 8 };
+				return std::make_pair(i % 8, i / 8);
 			}
 		}
 		return none;
 	}
 
 public:
-	Point play(const Reversi::ReversiEngine&) override
+	Pos play(const Reversi::ReversiEngine&) override
 	{
-		Optional<Point>pos;
+		Optional<Pos>pos;
 		while(not pos and not isAborted())
 		{
 			pos = playStep();
 			System::Sleep(10);
 		}
 		if (pos) return *pos;
-		else return Point{ 0,0 };
+		else return { 0,0 };
 	}
 
 	void reset_child() override {}

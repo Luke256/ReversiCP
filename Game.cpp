@@ -85,9 +85,12 @@ void Game::draw() const
 
 void Game::reset()
 {
+	std::vector<int32_t>arr(64);
 	engine.reset();
-	engine.getBoard(boardState);
-	Reversi::bit2boad(engine.getLegals(), legals);
+	engine.getBoard(arr);
+	boardState = arr;
+	Reversi::bit2boad(engine.getLegals(), arr);
+	legals = arr;
 	subjectiveState = boardState;
 	isFirstFrame = true;
 }
@@ -110,7 +113,8 @@ void Game::updatePlayers()
 		}
 		auto F = [&]() -> Point
 			{
-				return agents_ptr[*player.type.selectedItemIndex]->play(engine);
+				auto p = agents_ptr[*player.type.selectedItemIndex]->play(engine);
+				return Point{ p.first, p.second };
 			};
 		agents_ptr[*player.type.selectedItemIndex]->reset();
 		playTask = Async(F);
@@ -131,8 +135,13 @@ void Game::updatePlayers()
 		engine.pass();
 	}
 
-	engine.getBoard(boardState);
-	Reversi::bit2boad(engine.getLegals(), legals);
+	std::vector<int32_t>arr(64);
+	
+	engine.getBoard(arr);
+	boardState = arr;
+	Reversi::bit2boad(engine.getLegals(), arr);
+	legals = arr;
+
 	subjectiveState = boardState;
 	if (not engine.isBlackTurn())
 	{

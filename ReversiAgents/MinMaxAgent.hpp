@@ -6,7 +6,7 @@ class MinMaxAgent : public ReversiAgent
 {
 public:
 	MinMaxAgent();
-	Point play(const Reversi::ReversiEngine& engine) override;
+	Pos play(const Reversi::ReversiEngine& engine) override;
 	void reset_child() override;
 private:
 	const Grid<int32>valPerCell = {

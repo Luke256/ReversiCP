@@ -5,7 +5,7 @@ class RandomAgent : public ReversiAgent
 {
 public:
 	RandomAgent() {}
-	Point play(const Reversi::ReversiEngine& engine) override
+	Pos play(const Reversi::ReversiEngine& engine) override
 	{
 		uint64 uintlegals = engine.getLegals();
 		Array<int32> legals;
@@ -20,7 +20,7 @@ public:
 		}
 
 		int32 p = Sample(legals);
-		return Point{ p % 8, p / 8 };
+		return { p % 8, p / 8 };
 	}
 	void reset_child() override {}
 };

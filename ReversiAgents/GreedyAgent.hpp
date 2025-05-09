@@ -6,7 +6,7 @@ class GreedyAgent : public ReversiAgent
 {
 public:
 	GreedyAgent();
-	Point play(const Reversi::ReversiEngine& engine) override;
+	Pos play(const Reversi::ReversiEngine& engine) override;
 	void reset_child() override;
 private:
 	const Grid<int32>valPerCell = {

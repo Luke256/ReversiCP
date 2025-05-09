@@ -5,7 +5,7 @@ GreedyAgent::GreedyAgent()
 
 }
 
-Point GreedyAgent::play(const Reversi::ReversiEngine& engine)
+GreedyAgent::Pos GreedyAgent::play(const Reversi::ReversiEngine& engine)
 {
 	Reversi::ReversiEngine env = engine;
 	if (not env.isBlackTurn()) env.swapBW(); // 黒を扱いたい
@@ -29,7 +29,7 @@ Point GreedyAgent::play(const Reversi::ReversiEngine& engine)
 		}
 		mask >>= 1;
 	}
-	return Point{ best % 8, best / 8 };
+	return { best % 8, best / 8 };
 }
 
 void GreedyAgent::reset_child()
