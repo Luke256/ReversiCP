@@ -10,32 +10,37 @@ Point AlphaBetaAgent::play(const Reversi::ReversiEngine& engine)
 	callCnt = 0;
 	Reversi::ReversiEngine env = engine;
 	if (not env.isBlackTurn()) env.swapBW(); // 黒を扱いたい
-	const uint64 legals = env.getLegals();
 	const uint64 prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
+	const int32 SEARCH_DEPTH = 6;
 
-	uint64 mask = 0x8000000000000000;
 	int32 best = -1, score, alpha = -inf, beta = inf;
-	for (int32 i : step(64))
+	Array<LegalState> legals;
+
+	for (int32 depth : step(SEARCH_DEPTH))
 	{
-		if (not (legals & mask))
-		{
-			mask >>= 1;
-			continue;
-		}
-		env.place(i % 8, i / 8);
-		score = -negaAlpha(env, 6, false, -beta, -alpha);
+		if (isAborted()) break;
+		alpha = -inf, beta = inf;
 
-		if (alpha < score)
-		{
-			alpha = score;
-			best = i;
-		}
+		getSortedLegals(env, legals);
 
-		env.setState(prevBlacks, prevWhites, true);
-		mask >>= 1;
+		for (auto [v, idx] : legals)
+		{
+			env.place(idx & 7, idx >> 3);
+			score = -negaAlpha(env, depth + 1, false, -beta, -alpha);
+
+			if (alpha < score)
+			{
+				alpha = score;
+				best = idx;
+			}
+
+			env.setState(prevBlacks, prevWhites, true);
+		}
+		transTable.swap(transTablePrev);
+		transTable.clear();
 	}
 	Console << U"AlphaBeta: " << callCnt << U" calls.";
-	return Point{ best % 8, best / 8 };
+	return Point{ best & 7, best >> 3 };
 }
 
 void AlphaBetaAgent::reset_child()
@@ -48,24 +53,21 @@ int32 AlphaBetaAgent::negaAlpha(Reversi::ReversiEngine& engine, int32 depth, boo
 	if (depth == 0) return eval(engine);
 	if (transTable.contains(engine.getTupleState())) return transTable[engine.getTupleState()];
 
-	const uint64 legals = engine.getLegals(), prevBlacks = engine.getBlacks(), prevWhites = engine.getWhites();
-	uint64 mask = 0x8000000000000000;
+	const uint64 prevBlacks = engine.getBlacks(), prevWhites = engine.getWhites();
 	const bool prevBlackTurn = engine.isBlackTurn();
 	int32 maxScore = -inf, g = 0;
-	for (int32 i : step(64))
+
+	Array<LegalState> legals;
+	getSortedLegals(engine, legals);
+
+	for (auto [v, idx] : legals)
 	{
-		if (not (legals & mask))
-		{
-			mask >>= 1;
-			continue;
-		}
-		engine.place(i & 7, i >> 3);
+		engine.place(idx & 7, idx >> 3);
 		g = -negaAlpha(engine, depth - 1, false, -beta, -alpha);
 		if (g >= beta) return g;
 		alpha = Max(alpha, g);
 		maxScore = Max(maxScore, g);
 		engine.setState(prevBlacks, prevWhites, prevBlackTurn);
-		mask >>= 1;
 	}
 
 	if (maxScore != -inf) return transTable[engine.getTupleState()] = maxScore; // 操作をした
