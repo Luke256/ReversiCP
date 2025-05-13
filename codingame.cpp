@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <bit>
+#include "ReversiEngine.hpp"
 #include "ReversiAgents/AlphaBetaAgent.hpp"
 
 using namespace std;

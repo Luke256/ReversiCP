@@ -155,7 +155,7 @@ namespace Reversi
 		}
 	}
 
-	void ReversiEngine::getBoard(std::vector<int32>& board) const
+	void ReversiEngine::getBoard(std::vector<int32_t>& board) const
 	{
 		uint64_t mask = 0x8000000000000000;
 		uint32_t cnt = 0;
@@ -191,12 +191,12 @@ namespace Reversi
 		return m_blackTurn;
 	}
 
-	int32 ReversiEngine::getNBlacks() const
+	int32_t ReversiEngine::getNBlacks() const
 	{
 		return std::popcount(m_blacks);
 	}
 
-	int32 ReversiEngine::getNWhites() const
+	int32_t ReversiEngine::getNWhites() const
 	{
 		return std::popcount(m_whites);
 	}
@@ -218,7 +218,7 @@ namespace Reversi
 		return true;
 	}
 
-	void bit2boad(const uint64_t& bit, std::vector<int32>& board)
+	void bit2boad(const uint64_t& bit, std::vector<int32_t>& board)
 	{
 		uint64_t mask = 0x8000000000000000;
 		uint32_t cnt = 0;

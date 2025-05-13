@@ -5,7 +5,7 @@ namespace CodeExpander
 
 	struct Code
 	{
-		Array<String> includedHeaderFiles;
+		Array<String> includedFiles;
 		Array<String> libraries;
 		Array<String> codes;
 
@@ -40,8 +40,11 @@ namespace CodeExpander
 		}
 	}
 
-	void AnalyzeCode(const String& fileName, Code& res)
+	void AnalyzeCode(String fileName, Code& res)
 	{
+		fileName = FileSystem::FullPath(fileName);
+		if (res.includedFiles.contains(fileName)) return;
+		res.includedFiles << fileName;
 		TextReader reader{ fileName };
 		if (not reader) throw Error(U"Failed to read source file: {}"_fmt(fileName));
 
@@ -62,12 +65,13 @@ namespace CodeExpander
 			if (line.includes(U"include"))
 			{
 				String includedFile = getInclude(line);
-				String path = FileSystem::PathAppend(FileSystem::ParentPath(fileName), includedFile);
+				String path = FileSystem::FullPath(FileSystem::PathAppend(FileSystem::ParentPath(fileName), includedFile));
+				
 				if (line.includes('<'))
 				{
 					res.libraries << includedFile;
 				}
-				else if (baseName != FileSystem::BaseName(includedFile) and not res.includedHeaderFiles.contains(path))
+				else if (baseName != FileSystem::BaseName(includedFile))
 				{
 					AnalyzeCode(path, res);
 					if (path.ends_with(U".hpp"))
@@ -76,7 +80,6 @@ namespace CodeExpander
 						{
 							bufferedSourceFiles << path.replaced(U".hpp", U".cpp");
 						}
-						res.includedHeaderFiles << path;
 					}
 				}
 			}
@@ -93,7 +96,11 @@ namespace CodeExpander
 	void Expand(const String& targetFile)
 	{
 		Code code;
+
 		AnalyzeCode(targetFile, code);
-		code.write(targetFile + U".expanded");
+
+		String outFile = FileSystem::ParentPath(targetFile) + FileSystem::FileName(targetFile) + U".expanded." + FileSystem::Extension(targetFile);
+
+		code.write(outFile);
 	}
 };

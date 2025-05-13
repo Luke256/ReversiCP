@@ -39,7 +39,6 @@ AlphaBetaAgent::Pos AlphaBetaAgent::play(const Reversi::ReversiEngine& engine)
 		transTable.swap(transTablePrev);
 		transTable.clear();
 	}
-	Console << U"AlphaBeta: " << callCnt << U" calls.";
 	return { best & 7, best >> 3 };
 }
 
@@ -65,8 +64,8 @@ int32_t AlphaBetaAgent::negaAlpha(Reversi::ReversiEngine& engine, int32_t depth,
 		engine.place(idx & 7, idx >> 3);
 		g = -negaAlpha(engine, depth - 1, false, -beta, -alpha);
 		if (g >= beta) return g;
-		alpha = Max(alpha, g);
-		maxScore = Max(maxScore, g);
+		alpha = std::max(alpha, g);
+		maxScore = std::max(maxScore, g);
 		engine.setState(prevBlacks, prevWhites, prevBlackTurn);
 	}
 
@@ -110,5 +109,8 @@ inline int32_t AlphaBetaAgent::eval(const Reversi::ReversiEngine& engine) const
 	score /= 256; // 生の評価値は最終石差の256倍なので、256で割る
 	if (score > 64) score = 64; // 評価値を[-64, 64] に収める
 	else if (score < -64) score = -64;
+
+	score += std::popcount(engine.getLegals());
+
 	return score;
 }

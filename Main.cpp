@@ -18,8 +18,6 @@ void Main()
 	targetFile = FileSystem::ParentPath(targetFile);
 	targetFile = FileSystem::PathAppend(targetFile, U"codingame.cpp");
 
-	Console << targetFile;
-
 	CodeExpander::Expand(targetFile);
 
 	while (System::Update())

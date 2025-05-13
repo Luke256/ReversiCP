@@ -38,6 +38,7 @@ private:
 	};
 
 	const std::vector<int32_t>rowValues = _initRowValues();
+	const int32_t MAX_CALL_CNT = 100000;
 
 	std::vector<int32_t> _initRowValues()
 	{
@@ -48,7 +49,7 @@ private:
 		{
 			for (bit = 0; bit < (1 << 8); bit++)
 			{
-				for (j = 0; i < 8; j++)
+				for (j = 0; j < 8; j++)
 				{
 					if (bit & (1 << (7 - j)))
 					{
