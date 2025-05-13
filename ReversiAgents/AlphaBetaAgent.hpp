@@ -1,6 +1,7 @@
 ﻿# pragma once
 
 # include "Agent.hpp"
+# include <unordered_map>
 
 class AlphaBetaAgent : public ReversiAgent
 {
@@ -38,15 +39,16 @@ private:
 
 	const std::vector<int32_t>rowValues = _initRowValues();
 
-	constexpr std::vector<int32_t> _initRowValues()
+	std::vector<int32_t> _initRowValues()
 	{
 		//Grid<int32_t>res{ 8, (1 << 8) };
 		std::vector<int32_t> res(1 << 11);
-		for (int32_t i : step(8))
+		int32_t i, bit, j;
+		for (i = 0; i < 8; i++)
 		{
-			for (int32_t bit : step(1 << 8))
+			for (bit = 0; bit < (1 << 8); bit++)
 			{
-				for (int32_t j : step(8))
+				for (j = 0; i < 8; j++)
 				{
 					if (bit & (1 << (7 - j)))
 					{
@@ -75,8 +77,8 @@ private:
 		legalList.assign(std::popcount(legals), { 0,0 });
 
 		uint64_t mask = 0x8000000000000000;
-		int32_t idx = 0;
-		for (int32_t i : step(64))
+		int32_t idx = 0, i;
+		for (i = 0; i < 64; i++)
 		{
 			if (not (legals & mask))
 			{

@@ -13,10 +13,10 @@ AlphaBetaAgent::Pos AlphaBetaAgent::play(const Reversi::ReversiEngine& engine)
 	const uint64_t prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
 	const int32_t SEARCH_DEPTH = 6;
 
-	int32_t best = -1, score, alpha = -inf, beta = inf;
+	int32_t best = -1, score, alpha = -inf, beta = inf, depth;
 	std::vector<LegalState> legals;
 
-	for (int32_t depth : step(SEARCH_DEPTH))
+	for (depth = 0; depth < SEARCH_DEPTH; depth++)
 	{
 		if (isAborted()) break;
 		alpha = -inf, beta = inf;
