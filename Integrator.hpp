@@ -1,0 +1,99 @@
+﻿#pragma once
+
+namespace CodeExpander
+{
+
+	struct Code
+	{
+		Array<String> includedHeaderFiles;
+		Array<String> libraries;
+		Array<String> codes;
+
+		void write(String fileName)
+		{
+			TextWriter writer{ fileName };
+			if (not writer)
+			{
+				throw Error{ U"Failed to open {} to write."_fmt(fileName)};
+			}
+
+			for (auto lib : libraries)
+			{
+				writer << U"# include <{}>"_fmt(lib);
+			}
+			for (auto code : codes)
+			{
+				writer << code;
+			}
+		}
+	};
+	
+	String getInclude(String line)
+	{
+		if (line.includes('"'))
+		{
+			return line.split('"')[1];
+		}
+		else
+		{
+			return line.split('<')[1].split('>')[0];
+		}
+	}
+
+	void AnalyzeCode(const String& fileName, Code& res)
+	{
+		TextReader reader{ fileName };
+		if (not reader) throw Error(U"Failed to read source file: {}"_fmt(fileName));
+
+		String line;
+		const String baseName = FileSystem::BaseName(fileName);
+		Array<String> bufferedSourceFiles;
+
+		while (reader.readLine(line))
+		{
+			if (not line.starts_with('#'))
+
+			{
+				res.codes << line;
+				continue;
+			}
+			if (line.includes(U"pragma once")) continue;
+
+			if (line.includes(U"include"))
+			{
+				String includedFile = getInclude(line);
+				String path = FileSystem::PathAppend(FileSystem::ParentPath(fileName), includedFile);
+				if (line.includes('<'))
+				{
+					res.libraries << includedFile;
+				}
+				else if (baseName != FileSystem::BaseName(includedFile) and not res.includedHeaderFiles.contains(path))
+				{
+					AnalyzeCode(path, res);
+					if (path.ends_with(U".hpp"))
+					{
+						if (FileSystem::Exists(path.replaced(U".hpp", U".cpp")))
+						{
+							bufferedSourceFiles << path.replaced(U".hpp", U".cpp");
+						}
+						res.includedHeaderFiles << path;
+					}
+				}
+			}
+		}
+
+		for (auto sourceFile : bufferedSourceFiles)
+		{
+			AnalyzeCode(sourceFile, res);
+		}
+
+		res.libraries.stable_unique();
+	}
+
+	void Expand(const String& targetFile)
+	{
+		Code code;
+		AnalyzeCode(targetFile, code);
+		code.write(targetFile + U".expanded");
+	}
+};
