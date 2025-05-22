@@ -51,11 +51,17 @@ namespace CodeExpander
 		String line;
 		const String baseName = FileSystem::BaseName(fileName);
 		Array<String> bufferedSourceFiles;
+		bool siv3dIgnore = false;
 
 		while (reader.readLine(line))
 		{
-			if (not line.starts_with('#'))
+			if (siv3dIgnore)
+			{
+				if (line.starts_with(U"#endif")) siv3dIgnore = false;
+				continue;
+			}
 
+			if (not line.starts_with('#'))
 			{
 				res.codes << line;
 				continue;
@@ -82,6 +88,12 @@ namespace CodeExpander
 						}
 					}
 				}
+			}
+
+			if (line.includes(U"ifdef SIV3D_INCLUDED"))
+			{
+				siv3dIgnore = true;
+				continue;
 			}
 		}
 

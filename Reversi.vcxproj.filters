@@ -139,6 +139,15 @@
     <Filter Include="ReversiAgents">
       <UniqueIdentifier>{64203944-2a62-4490-a6b5-0f1b7ff2cc5f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{90434aa2-fd18-4751-ba06-0c0671ee365e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\CMat">
+      <UniqueIdentifier>{365cecd1-4dc3-43b6-8af5-2584a016adc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\CMat\CMat">
+      <UniqueIdentifier>{4bc402ee-1348-47df-b21a-fb85389ad1af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -857,8 +866,17 @@
     <ClInclude Include="ReversiAgents\AlphaBetaAgent.hpp">
       <Filter>ReversiAgents</Filter>
     </ClInclude>
-    <ClInclude Include="Integrator.hpp">
+    <ClInclude Include="CodeExpander.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CMat\CMat.hpp">
+      <Filter>lib\CMat</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CMat\CMat\Matrix.hpp">
+      <Filter>lib\CMat\CMat</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\CMat\CMat\Shape.hpp">
+      <Filter>lib\CMat\CMat</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

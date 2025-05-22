@@ -1,9 +1,18 @@
 ﻿# include "Main.hpp"
 # include "Game.hpp"
-# include "Integrator.hpp"
+# include "CodeExpander.hpp"
+# include "lib/CMat/CMat.hpp"
 
 void Main()
 {
+	CMat::CMat<int>x = {
+		{1,2,3},
+		{4,5,6},
+		{7,8,9},
+	};
+
+	Console << x;
+
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
 
