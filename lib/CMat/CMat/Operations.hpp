@@ -1,7 +1,5 @@
 ﻿# pragma once
 
-#include <immintrin.h>
-
 # include "Matrix.hpp"
 # include "Shape.hpp"
 
@@ -82,7 +80,7 @@ namespace CMat
 
 
 	template<class _Dty>
-	CMat<_Dty> matmul(const CMat<_Dty>& a, const CMat<_Dty>& b) {
+	inline CMat<_Dty> matmul(const CMat<_Dty>& a, const CMat<_Dty>& b) {
 		if (a.shape.cols != b.shape.rows)
 			throw std::invalid_argument("Number of cols for a and number of rows for b doesn't match.");
 

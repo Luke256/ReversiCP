@@ -2,6 +2,9 @@
 
 # include <vector>
 # include <initializer_list>
+# include <cstdint>
+# include <stdexcept>
+# include <immintrin.h>
 # include "Shape.hpp"
 
 namespace CMat
@@ -42,19 +45,53 @@ namespace CMat
 		const _Dty* data() const { return m_data.data(); }
 		size_t size() { return m_data.size(); }
 
-		CMat& transpose()
+
+		inline CMat& transpose()
 		{
+			constexpr bool is_float = std::is_same_v<_Dty, float>;
+			constexpr bool is_double = std::is_same_v<_Dty, double>;
+
 			std::vector<_Dty>res(shape.cols * shape.rows);
-			for (uint32_t i = 0; i < shape.rows; ++i) {
-				for (uint32_t j = 0; j < shape.cols; ++j) {
+			uint32_t i, j, k;
+
+			for (i = 0; i < shape.rows; ++i)
+			{
+				j = 0;
+				if constexpr (is_float)
+				{
+					for (; j + 8 <= shape.cols; j += 8)
+					{
+						__m256 vec = _mm256_loadu_ps(&m_data[i * shape.cols + j]);
+						for (k = 0; k < 8; ++k)
+						{
+							res[(j + k) * shape.rows + i] = ((float*)&vec)[k];
+						}
+					}
+				}
+				else if constexpr (is_double)
+				{
+					for (; j + 4 <= shape.cols; j += 4)
+					{
+						__m256 vec = _mm256_loadu_pd(&m_data[i * shape.cols + j]);
+						for (k = 0; k < 4; ++k)
+						{
+							res[(j + k) * shape.rows + i] = ((float*)&vec)[k];
+						}
+					}
+				}
+
+				for (; j < shape.cols; ++j)
+				{
 					res[j * shape.rows + i] = m_data[i * shape.cols + j];
 				}
 			}
+
 			m_data.swap(res);
+			std::swap(shape.cols, shape.rows);
 			return *this;
 		}
 
-		CMat transposed() const
+		inline CMat transposed() const
 		{
 			return CMat(*this).transpose();
 		}
