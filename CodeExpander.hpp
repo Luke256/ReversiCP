@@ -8,6 +8,7 @@ namespace CodeExpander
 		Array<String> includedFiles;
 		Array<String> libraries;
 		Array<String> codes;
+		Array<String> controllers;
 
 		void write(String fileName)
 		{
@@ -15,6 +16,11 @@ namespace CodeExpander
 			if (not writer)
 			{
 				throw Error{ U"Failed to open {} to write."_fmt(fileName)};
+			}
+
+			for (auto controller : controllers)
+			{
+				writer << controller;
 			}
 
 			for (auto lib : libraries)
@@ -88,6 +94,7 @@ namespace CodeExpander
 						}
 					}
 				}
+				continue;
 			}
 
 			if (line.includes(U"ifdef SIV3D_INCLUDED"))
@@ -95,6 +102,8 @@ namespace CodeExpander
 				siv3dIgnore = true;
 				continue;
 			}
+
+			res.controllers << line;
 		}
 
 		for (auto sourceFile : bufferedSourceFiles)

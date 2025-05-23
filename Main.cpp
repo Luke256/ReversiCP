@@ -6,11 +6,11 @@
 
 void Main()
 {
-	CMat::CMat<int>x(CMat::MatShape{ 1000, 1000 });
-	CMat::CMat<int>y(CMat::MatShape{ 1000, 1000 });
+	CMat::CMat<float>x(CMat::MatShape{ 1024, 1024 });
+	CMat::CMat<float>y(CMat::MatShape{ 1024, 1024 });
 
 	auto start = std::chrono::high_resolution_clock::now();
-	CMat::CMat<int>z = CMat::matmul(x, y);
+	CMat::CMat<float>z = CMat::matmul(x, y);
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
 	Console << U"CMat: " << duration.count() << U" microseconds";
