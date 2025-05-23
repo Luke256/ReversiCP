@@ -3,26 +3,24 @@
 # include "CodeExpander.hpp"
 # include "lib/CMat/CMat.hpp"
 
+
 void Main()
 {
-	CMat::CMat<int>x = {
-		{1,2,3},
-		{4,5,6},
-		{7,8,9},
-	};
+	CMat::CMat<int>x(CMat::MatShape{ 1000, 1000 });
+	CMat::CMat<int>y(CMat::MatShape{ 1000, 1000 });
 
-	CMat::CMat<int>y = {
-		{9,8,7},
-		{6,5,4},
-		{3,2,1}
-	};
-
-	Console << U"x = " << x;
-	Console << U"y = " << y;
-	Console << U"x + y = " << x + y;
+	auto start = std::chrono::high_resolution_clock::now();
+	CMat::CMat<int>z = CMat::matmul(x, y);
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+	Console << U"CMat: " << duration.count() << U" microseconds";
 
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
+
+	x = { {1,2,3},{4,5,6},{7,8,9} };
+	y = { {9,8,7},{6,5,4},{3,2,1} };
+	Console << CMat::matmul(x, y);
 
 	MyApp app;
 
