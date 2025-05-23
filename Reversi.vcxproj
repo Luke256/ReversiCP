@@ -335,6 +335,7 @@
     <ClInclude Include="CodeExpander.hpp" />
     <ClInclude Include="lib\CMat\CMat.hpp" />
     <ClInclude Include="lib\CMat\CMat\Matrix.hpp" />
+    <ClInclude Include="lib\CMat\CMat\Operations.hpp" />
     <ClInclude Include="lib\CMat\CMat\Shape.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="ReversiAgents\Agent.hpp" />

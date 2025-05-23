@@ -11,11 +11,13 @@ namespace CMat
 	class CMat
 	{
 	private:
-		std::vector<_Dty> data;
-		MatShape shape, strides;
+		std::vector<_Dty> m_data;
+		MatShape m_strides;
 	public:
-		CMat() : shape(0, 0), strides(0, 0) {}
-		CMat(const std::initializer_list<_Dty>& init) : data(init.begin(), init.end()), shape(1, init.size()), strides(init.size(), 1) {}
+		MatShape shape;
+
+		CMat() : shape(0, 0), m_strides(0, 0) {}
+		CMat(const std::initializer_list<_Dty>& init) : m_data(init.begin(), init.end()), shape(1, init.size()), m_strides(init.size(), 1) {}
 
 		CMat(const std::initializer_list<std::initializer_list<_Dty>>& init)
 		{
@@ -30,74 +32,13 @@ namespace CMat
 				{
 					throw std::invalid_argument("All rows of the initializer list needs to have the same number of elements.");
 				}
-				data.insert(data.end(), i.begin(), i.end());
+				m_data.insert(m_data.end(), i.begin(), i.end());
 			}
 		}
 
-		CMat& operator+=(const CMat& a)
-		{
-			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
-
-			_Dty* p = data.data();
-			const _Dty* q = a.data.data();
-			const _Dty* end = p + data.size();
-
-			while (p != end)
-			{
-				*p++ += *q++;
-			}
-			return *this;
-		}
-
-		CMat& operator-=(const CMat& a)
-		{
-			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
-
-			_Dty* p = data.data();
-			const _Dty* q = a.data.data();
-			const _Dty* end = p + data.size();
-
-			while (p != end)
-			{
-				*p++ -= *q++;
-			}
-			return *this;
-		}
-
-		CMat& operator*=(const CMat& a)
-		{
-			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
-
-			_Dty* p = data.data();
-			const _Dty* q = a.data.data();
-			const _Dty* end = p + data.size();
-
-			while (p != end)
-			{
-				*p++ *= *q++;
-			}
-			return *this;
-		}
-
-		CMat& operator/=(const CMat& a)
-		{
-			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
-
-			_Dty* p = data.data();
-			const _Dty* q = a.data.data();
-			const _Dty* end = p + data.size();
-
-			while (p != end)
-			{
-				*p++ /= *q++;
-			}
-			return *this;
-		}
-
-		CMat operator+(const CMat& a) { return CMat(*this) += a; }
-		CMat operator-(const CMat& a) { return CMat(*this) -= a; }
-		CMat operator*(const CMat& a) { return CMat(*this) *= a; }
-		CMat operator/(const CMat& a) { return CMat(*this) /= a; }
+		_Dty* data() { return m_data.data(); }
+		const _Dty* data() const { return m_data.data(); }
+		size_t size() { return m_data.size(); }
 
 #ifdef SIV3D_INCLUDED
 
@@ -110,8 +51,8 @@ namespace CMat
 				else formatData.string += U"  {";
 				for (uint32_t j : step(value.shape.cols))
 				{
-					if (j == 0) formatData.string += U" {}"_fmt(value.data[i * value.shape.rows + j]);
-					else formatData.string += U", {}"_fmt(value.data[i * value.shape.rows + j]);
+					if (j == 0) formatData.string += U" {}"_fmt(value.m_data[i * value.shape.rows + j]);
+					else formatData.string += U", {}"_fmt(value.m_data[i * value.shape.rows + j]);
 				}
 
 				if (i == value.shape.rows - 1) formatData.string += U" }";

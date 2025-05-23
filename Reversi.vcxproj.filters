@@ -878,5 +878,8 @@
     <ClInclude Include="lib\CMat\CMat\Shape.hpp">
       <Filter>lib\CMat\CMat</Filter>
     </ClInclude>
+    <ClInclude Include="lib\CMat\CMat\Operations.hpp">
+      <Filter>lib\CMat\CMat</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
