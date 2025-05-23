@@ -34,10 +34,70 @@ namespace CMat
 			}
 		}
 
-		void operator+=(const CMat& a)
+		CMat& operator+=(const CMat& a)
 		{
-			if (shape != a.shape) throw std::invalid_argument("Two shape of operand + doesn't match.");
+			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
+
+			_Dty* p = data.data();
+			const _Dty* q = a.data.data();
+			const _Dty* end = p + data.size();
+
+			while (p != end)
+			{
+				*p++ += *q++;
+			}
+			return *this;
 		}
+
+		CMat& operator-=(const CMat& a)
+		{
+			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
+
+			_Dty* p = data.data();
+			const _Dty* q = a.data.data();
+			const _Dty* end = p + data.size();
+
+			while (p != end)
+			{
+				*p++ -= *q++;
+			}
+			return *this;
+		}
+
+		CMat& operator*=(const CMat& a)
+		{
+			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
+
+			_Dty* p = data.data();
+			const _Dty* q = a.data.data();
+			const _Dty* end = p + data.size();
+
+			while (p != end)
+			{
+				*p++ *= *q++;
+			}
+			return *this;
+		}
+
+		CMat& operator/=(const CMat& a)
+		{
+			if (shape != a.shape) throw std::invalid_argument("Two shape of data for operand + doesn't match.");
+
+			_Dty* p = data.data();
+			const _Dty* q = a.data.data();
+			const _Dty* end = p + data.size();
+
+			while (p != end)
+			{
+				*p++ /= *q++;
+			}
+			return *this;
+		}
+
+		CMat operator+(const CMat& a) { return CMat(*this) += a; }
+		CMat operator-(const CMat& a) { return CMat(*this) -= a; }
+		CMat operator*(const CMat& a) { return CMat(*this) *= a; }
+		CMat operator/(const CMat& a) { return CMat(*this) /= a; }
 
 #ifdef SIV3D_INCLUDED
 

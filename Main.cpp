@@ -11,7 +11,15 @@ void Main()
 		{7,8,9},
 	};
 
-	Console << x;
+	CMat::CMat<int>y = {
+		{9,8,7},
+		{6,5,4},
+		{3,2,1}
+	};
+
+	Console << U"x = " << x;
+	Console << U"y = " << y;
+	Console << U"x + y = " << x + y;
 
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
