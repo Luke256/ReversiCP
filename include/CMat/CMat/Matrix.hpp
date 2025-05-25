@@ -45,9 +45,22 @@ namespace CMat
 		const _Dty* data() const { return m_data.data(); }
 
 		auto begin() { return m_data.begin(); }
-		const auto begin() const{ return m_data.begin(); }
+		const auto begin() const { return m_data.begin(); }
+		auto begin(uint32_t row) { return m_data.begin() + (shape.cols * row); }
+		const auto begin(uint32_t row) const { return m_data.begin() + (shape.cols * row); }
+		auto cbegin() { return m_data.cbegin(); }
+		const auto cbegin() const { return m_data.cbegin(); }
+		auto cbegin(uint32_t row) { return m_data.cbegin() + (shape.cols * row); }
+		const auto cbegin(uint32_t row) const { return m_data.cbegin() + (shape.cols * row); }
+
 		auto end() { return m_data.end(); }
-		const auto end() const{ return m_data.end(); }
+		const auto end() const { return m_data.end(); }
+		auto end(uint32_t row) { return begin(row) + shape.cols; }
+		const auto end(uint32_t row) const { return begin(row) + shape.cols; }
+		auto cend() { return m_data.cend(); }
+		const auto cend() const { return m_data.cend(); }
+		auto cend(uint32_t row) { return cbegin(row) + shape.cols; }
+		const auto cend(uint32_t row) const { return cbegin(row) + shape.cols; }
 		
 		size_t size() { return m_data.size(); }
 

@@ -1,72 +1,85 @@
 ﻿# pragma once
 
+# include <algorithm>
+
 # include "Matrix.hpp"
 # include "Shape.hpp"
 
 namespace CMat
 {
+	template<class _Dty, class Function, class... AdditionalOptions>
+	void __applyOperation(Matrix<_Dty>& a, const Matrix<_Dty>& b, Function& f, AdditionalOptions ...options)
+	{
+		if (a.shape == b.shape)
+		{
+			std::transform(a.cbegin(), a.cend(),
+				b.cbegin(),
+				a.begin(),
+				[&f, &options...](const auto& inValue1, const auto& inValue2) -> _Dty {
+					return f(inValue1, inValue2, std::forward<AdditionalOptions>(options)...);
+				});
+		}
+		else if (a.shape.cols == b.shape.cols and b.shape.rows == 1)
+		{
+			const* val_ptr = b.data();
+			for (uint32 row = 0; row < a.shape.rows; ++row)
+			{
+				std::transform(
+					a.cbegin(row),
+					a.cend(row),
+					a.begin(row),
+					[&val_ptr, &f, &options...](const auto& inValue) -> _Dty {
+						return f(inValue, *val_ptr, std::forward<AdditionalOptions>(options)...);
+					});
+				val_ptr++;
+			}
+		}
+		else if (a.shape.rows == b.shape.rows and b.shape.cols == 1)
+		{
+			a.transpose();
+			__applyOperation(a, b.transposed(), f, std::forward<AdditionalOptions>(options)...);
+			a.transpose();
+		}
+		else
+		{
+			throw std::invalid_argument("operands could not be operated together");
+		}
+	}
+
 	template<class _Dty>
 	Matrix<_Dty>& operator+=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
-		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator + doesn't match.");
 
-		_Dty* p = a.data();
-		const _Dty* q = b.data();
-		const _Dty* end = p + a.size();
+		//if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator - doesn't match.");
 
-		while (p != end)
-		{
-			*p++ += *q++;
-		}
-		return a;
+		//_Dty* p = a.data();
+		//const _Dty* q = b.data();
+		//const _Dty* end = p + a.size();
+
+		//while (p != end)
+		//{
+		//	*p++ -= *q++;
+		//}
+		//return a;
+		__applyOperation(a, b, std::plus);
 	}
 
 	template<class _Dty>
 	Matrix<_Dty>& operator-=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
-		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator - doesn't match.");
-
-		_Dty* p = a.data();
-		const _Dty* q = b.data();
-		const _Dty* end = p + a.size();
-
-		while (p != end)
-		{
-			*p++ -= *q++;
-		}
-		return a;
+		__applyOperation(a, b, std::minus);
 	}
 
 	template<class _Dty>
 	Matrix<_Dty>& operator*=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
-		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator * doesn't match.");
-
-		_Dty* p = a.data();
-		const _Dty* q = b.data();
-		const _Dty* end = p + a.size();
-
-		while (p != end)
-		{
-			*p++ *= *q++;
-		}
-		return a;
+		__applyOperation(a, b, std::multiplies);
 	}
 
 	template<class _Dty>
 	Matrix<_Dty>& operator/=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
-		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator / doesn't match.");
-
-		_Dty* p = a.data();
-		const _Dty* q = b.data();
-		const _Dty* end = p + a.size();
-
-		while (p != end)
-		{
-			*p++ /= *q++;
-		}
-		return a;
+		__applyOperation(a, b, std::divides);
 	}
 
 	template<class _Dty>
