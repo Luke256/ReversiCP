@@ -139,14 +139,20 @@
     <Filter Include="ReversiAgents">
       <UniqueIdentifier>{64203944-2a62-4490-a6b5-0f1b7ff2cc5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib">
+    <Filter Include="include">
       <UniqueIdentifier>{90434aa2-fd18-4751-ba06-0c0671ee365e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\CMat">
-      <UniqueIdentifier>{365cecd1-4dc3-43b6-8af5-2584a016adc4}</UniqueIdentifier>
+    <Filter Include="include\CMat">
+      <UniqueIdentifier>{69b5f3a5-b62e-43be-91e8-1889dd8f4491}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\CMat\CMat">
-      <UniqueIdentifier>{4bc402ee-1348-47df-b21a-fb85389ad1af}</UniqueIdentifier>
+    <Filter Include="include\CMat\CMat">
+      <UniqueIdentifier>{a565f314-38ab-4daa-a70a-56adc18a0b89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\NNCpp">
+      <UniqueIdentifier>{a8ec35af-d6be-42cc-b3da-34252bdda60b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\NNCpp\Modules">
+      <UniqueIdentifier>{e534e656-7db8-4517-9956-a7fff83be415}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -869,17 +875,32 @@
     <ClInclude Include="CodeExpander.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="lib\CMat\CMat.hpp">
-      <Filter>lib\CMat</Filter>
+    <ClInclude Include="include\CMat\CMat.hpp">
+      <Filter>include\CMat</Filter>
     </ClInclude>
-    <ClInclude Include="lib\CMat\CMat\Matrix.hpp">
-      <Filter>lib\CMat\CMat</Filter>
+    <ClInclude Include="include\CMat\CMat\Matrix.hpp">
+      <Filter>include\CMat\CMat</Filter>
     </ClInclude>
-    <ClInclude Include="lib\CMat\CMat\Shape.hpp">
-      <Filter>lib\CMat\CMat</Filter>
+    <ClInclude Include="include\CMat\CMat\Operations.hpp">
+      <Filter>include\CMat\CMat</Filter>
     </ClInclude>
-    <ClInclude Include="lib\CMat\CMat\Operations.hpp">
-      <Filter>lib\CMat\CMat</Filter>
+    <ClInclude Include="include\CMat\CMat\Shape.hpp">
+      <Filter>include\CMat\CMat</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NNCpp\NNCpp.hpp">
+      <Filter>include\NNCpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NNCpp\Modules\Dense.hpp">
+      <Filter>include\NNCpp\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NNCpp\Modules\Core.hpp">
+      <Filter>include\NNCpp\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NNCpp\Modules.hpp">
+      <Filter>include\NNCpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CMat\CMat\Random.hpp">
+      <Filter>include\CMat\CMat</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

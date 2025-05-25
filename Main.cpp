@@ -2,9 +2,22 @@
 # include "Game.hpp"
 # include "CodeExpander.hpp"
 
+# include "include/CMat/CMat.hpp"
+
 
 void Main()
 {
+	CMat::Matrix<float> a(CMat::MatShape{ 1024, 1024 });
+	CMat::Matrix<float> b(CMat::MatShape{ 1024, 1024 });
+	CMat::Matrix<float> c(CMat::MatShape{ 1024, 1024 });
+
+	auto start = std::chrono::high_resolution_clock::now();
+	c = CMat::matmul(a, b);
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+	Console << U"time: " << duration << U"ms";
+
+
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
 
