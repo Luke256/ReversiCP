@@ -1,26 +1,12 @@
 ﻿# include "Main.hpp"
 # include "Game.hpp"
 # include "CodeExpander.hpp"
-# include "lib/CMat/CMat.hpp"
 
 
 void Main()
 {
-	CMat::CMat<float>x(CMat::MatShape{ 1024, 1024 });
-	CMat::CMat<float>y(CMat::MatShape{ 1024, 1024 });
-
-	auto start = std::chrono::high_resolution_clock::now();
-	CMat::CMat<float>z = CMat::matmul(x, y);
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-	Console << U"CMat: " << duration.count() << U" microseconds";
-
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
-
-	x = { {1,2,3},{4,5,6},{7,8,9} };
-	y = { {9,8,7},{6,5,4},{3,2,1} };
-	Console << CMat::matmul(x, y);
 
 	MyApp app;
 

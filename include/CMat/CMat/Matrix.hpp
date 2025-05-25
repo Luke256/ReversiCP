@@ -11,7 +11,7 @@ namespace CMat
 {
 
 	template<class _Dty>
-	class CMat
+	class Matrix
 	{
 	private:
 		std::vector<_Dty> m_data;
@@ -19,10 +19,10 @@ namespace CMat
 	public:
 		MatShape shape;
 
-		CMat() : shape(0, 0), m_strides(0, 0) {}
-		CMat(const std::initializer_list<_Dty>& init) : m_data(init.begin(), init.end()), shape(1, init.size()), m_strides(init.size(), 1) {}
+		Matrix() : shape(0, 0), m_strides(0, 0) {}
+		Matrix(const std::initializer_list<_Dty>& init) : m_data(init.begin(), init.end()), shape(1, init.size()), m_strides(init.size(), 1) {}
 
-		CMat(const std::initializer_list<std::initializer_list<_Dty>>& init)
+		Matrix(const std::initializer_list<std::initializer_list<_Dty>>& init)
 		{
 			shape.rows = static_cast<uint32_t>(init.size());
 			for (const auto& i : init)
@@ -39,14 +39,14 @@ namespace CMat
 			}
 		}
 
-		CMat(const MatShape& shape): m_data(shape.cols * shape.rows), shape(shape) {}
+		Matrix(const MatShape& shape): m_data(shape.cols * shape.rows), shape(shape) {}
 
 		_Dty* data() { return m_data.data(); }
 		const _Dty* data() const { return m_data.data(); }
 		size_t size() { return m_data.size(); }
 
 
-		inline CMat& transpose()
+		inline Matrix& transpose()
 		{
 			constexpr bool is_float = std::is_same_v<_Dty, float>;
 			constexpr bool is_double = std::is_same_v<_Dty, double>;
@@ -91,14 +91,14 @@ namespace CMat
 			return *this;
 		}
 
-		inline CMat transposed() const
+		inline Matrix transposed() const
 		{
-			return CMat(*this).transpose();
+			return Matrix(*this).transpose();
 		}
 
 #ifdef SIV3D_INCLUDED
 
-		friend void Formatter(FormatData& formatData, const CMat& value)
+		friend void Formatter(FormatData& formatData, const Matrix& value)
 		{
 			formatData.string += U"{ ";
 			for (uint32_t i : step(value.shape.rows))
