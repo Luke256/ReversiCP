@@ -39,7 +39,7 @@ namespace CMat
 			}
 		}
 
-		Matrix(const MatShape& shape): m_data(shape.cols * shape.rows), shape(shape) {}
+		Matrix(const MatShape& shape, _Dty x=0): m_data(shape.cols * shape.rows, x), shape(shape) {}
 
 		_Dty* data() { return m_data.data(); }
 		const _Dty* data() const { return m_data.data(); }
@@ -126,8 +126,8 @@ namespace CMat
 				else formatData.string += U"  {";
 				for (uint32_t j : step(value.shape.cols))
 				{
-					if (j == 0) formatData.string += U" {}"_fmt(value.m_data[i * value.shape.rows + j]);
-					else formatData.string += U", {}"_fmt(value.m_data[i * value.shape.rows + j]);
+					if (j == 0) formatData.string += U" {}"_fmt(value.m_data[i * value.shape.cols + j]);
+					else formatData.string += U", {}"_fmt(value.m_data[i * value.shape.cols + j]);
 				}
 
 				if (i == value.shape.rows - 1) formatData.string += U" }";
@@ -138,4 +138,26 @@ namespace CMat
 
 #endif
 	};
+
+	template<class _Dty>
+	Matrix<_Dty> zeros(MatShape shape)
+	{
+		return Matrix<_Dty>(shape);
+	}
+	template<class _Dty>
+	Matrix<_Dty> zerosLike(const Matrix<_Dty>& x)
+	{
+		return Matrix<_Dty>(x.shape);
+	}
+
+	template<class _Dty>
+	Matrix<_Dty> ones(MatShape shape)
+	{
+		return Matrix<_Dty>(shape, 1);
+	}
+	template<class _Dty>
+	Matrix<_Dty> onesLike(const Matrix<_Dty>& x)
+	{
+		return Matrix<_Dty>(x.shape, 1);
+	}
 };

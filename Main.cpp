@@ -3,20 +3,25 @@
 # include "CodeExpander.hpp"
 
 # include "include/CMat/CMat.hpp"
+# include "include/NNCpp/NNCpp.hpp"
 
 
 void Main()
 {
-	CMat::Matrix<float> a(CMat::MatShape{ 1024, 1024 });
-	CMat::Matrix<float> b(CMat::MatShape{ 1024, 1024 });
-	CMat::Matrix<float> c(CMat::MatShape{ 1024, 1024 });
+	CMat::Matrix<float> a = CMat::Random::rand<float>(CMat::MatShape{ 20, 1024 });
 
-	auto start = std::chrono::high_resolution_clock::now();
-	c = CMat::matmul(a, b);
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-	Console << U"time: " << duration << U"ms";
+	NNCpp::Modules::Dense<float>fc(1024, 20);
+	NNCpp::Modules::ReLU<float>relu;
 
+	fc.forward(a, a);
+	relu.forward(a, a);
+
+	a = CMat::ones<float>(CMat::MatShape{ 20, 20 });
+
+	relu.backward(a, a);
+	fc.backward(a, a);
+
+	Console << a;
 
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);

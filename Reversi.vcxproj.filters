@@ -154,6 +154,9 @@
     <Filter Include="include\NNCpp\Modules">
       <UniqueIdentifier>{e534e656-7db8-4517-9956-a7fff83be415}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\NNCpp\Utils">
+      <UniqueIdentifier>{670f12e5-79a3-42c0-9241-a2d2bf06cceb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -901,6 +904,15 @@
     </ClInclude>
     <ClInclude Include="include\CMat\CMat\Random.hpp">
       <Filter>include\CMat\CMat</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CMat\CMat\Calculations.hpp">
+      <Filter>include\CMat\CMat</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NNCpp\Modules\Relu.hpp">
+      <Filter>include\NNCpp\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NNCpp\Utils\ParamInfo.hpp">
+      <Filter>include\NNCpp\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

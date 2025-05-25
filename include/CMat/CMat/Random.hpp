@@ -36,15 +36,14 @@ namespace CMat
 		}
 
 		template<class _Dty>
-		Matrix<_Dty> norm(MatShape shape)
+		Matrix<_Dty> norm(MatShape shape, _Dty mean = 0.0, _Dty std = 1.0)
 		{
 			Matrix<_Dty> res{ shape };
 			auto itr = res.begin();
 			auto end = res.end();
 			while (itr != end)
 			{
-				_Dty u1 = static_cast<_Dty>(random()), u2 = static_cast<_Dty>(random());
-				*itr++ = std::sqrt(-2 * std::log(u1) * std::cos(2 * 3.141592653589793238462643 * u2));
+				*itr++ = static_cast<_Dty>(std::sqrt(-2 * std::log(random())) * std::cos(2 * 3.141592653589793238462643 * random())) * std + mean;
 			}
 			return res;
 		}

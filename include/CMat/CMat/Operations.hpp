@@ -8,7 +8,7 @@
 namespace CMat
 {
 	template<class _Dty, class Function, class... AdditionalOptions>
-	void __applyOperation(Matrix<_Dty>& a, const Matrix<_Dty>& b, Function& f, AdditionalOptions ...options)
+	void __applyOperation(Matrix<_Dty>& a, const Matrix<_Dty>& b, const Function& f, AdditionalOptions ...options)
 	{
 		if (a.shape == b.shape)
 		{
@@ -21,7 +21,7 @@ namespace CMat
 		}
 		else if (a.shape.cols == b.shape.cols and b.shape.rows == 1)
 		{
-			const* val_ptr = b.data();
+			const _Dty* val_ptr = b.data();
 			for (uint32 row = 0; row < a.shape.rows; ++row)
 			{
 				std::transform(
@@ -61,25 +61,29 @@ namespace CMat
 		//	*p++ -= *q++;
 		//}
 		//return a;
-		__applyOperation(a, b, std::plus);
+		__applyOperation(a, b, std::plus<_Dty>());
+		return a;
 	}
 
 	template<class _Dty>
 	Matrix<_Dty>& operator-=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
-		__applyOperation(a, b, std::minus);
+		__applyOperation(a, b, std::minus<_Dty>());
+		return a;
 	}
 
 	template<class _Dty>
 	Matrix<_Dty>& operator*=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
-		__applyOperation(a, b, std::multiplies);
+		__applyOperation(a, b, std::multiplies<_Dty>());
+		return a;
 	}
 
 	template<class _Dty>
 	Matrix<_Dty>& operator/=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
-		__applyOperation(a, b, std::divides);
+		__applyOperation(a, b, std::divides<_Dty>());
+		return a;
 	}
 
 	template<class _Dty>

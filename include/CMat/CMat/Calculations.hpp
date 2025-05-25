@@ -5,11 +5,29 @@
 namespace CMat
 {
 	template<class _Dty>
+	_Dty sum(const Matrix<_Dty>& x)
+	{
+		_Dty res;
+		const _Dty* ptr = x.data();
+
+		uint32_t i, j;
+
+		for (i = 0; i < x.shape.rows; ++i)
+		{
+			for (j = 0; j < x.shape.cols; ++j)
+			{
+				res += *ptr++;
+			}
+		}
+		return res;
+	}
+
+	template<class _Dty>
 	Matrix<_Dty> sumRows(const Matrix<_Dty>& x)
 	{
 		Matrix<_Dty>res(MatShape{ 1, x.shape.cols });
-		auto* ptr = x.data();
-		auto* target_ptr;
+		const _Dty* ptr = x.data();
+		_Dty* target_ptr;
 
 		uint32_t i, j;
 

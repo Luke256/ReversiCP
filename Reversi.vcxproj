@@ -334,6 +334,7 @@
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="CodeExpander.hpp" />
     <ClInclude Include="include\CMat\CMat.hpp" />
+    <ClInclude Include="include\CMat\CMat\Calculations.hpp" />
     <ClInclude Include="include\CMat\CMat\Matrix.hpp" />
     <ClInclude Include="include\CMat\CMat\Operations.hpp" />
     <ClInclude Include="include\CMat\CMat\Random.hpp" />
@@ -341,7 +342,9 @@
     <ClInclude Include="include\NNCpp\Modules.hpp" />
     <ClInclude Include="include\NNCpp\Modules\Core.hpp" />
     <ClInclude Include="include\NNCpp\Modules\Dense.hpp" />
+    <ClInclude Include="include\NNCpp\Modules\Relu.hpp" />
     <ClInclude Include="include\NNCpp\NNCpp.hpp" />
+    <ClInclude Include="include\NNCpp\Utils\ParamInfo.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="ReversiAgents\Agent.hpp" />
     <ClInclude Include="ReversiAgents\AlphaBetaAgent.hpp" />
