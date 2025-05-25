@@ -2,3 +2,4 @@
 
 # include "CMat/Matrix.hpp"
 # include "CMat/Operations.hpp"
+# include "CMat/Random.hpp"

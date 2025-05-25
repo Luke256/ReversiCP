@@ -43,6 +43,12 @@ namespace CMat
 
 		_Dty* data() { return m_data.data(); }
 		const _Dty* data() const { return m_data.data(); }
+
+		auto begin() { return m_data.begin(); }
+		const auto begin() const{ return m_data.begin(); }
+		auto end() { return m_data.end(); }
+		const auto end() const{ return m_data.end(); }
+		
 		size_t size() { return m_data.size(); }
 
 

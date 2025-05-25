@@ -6,7 +6,7 @@
 namespace CMat
 {
 	template<class _Dty>
-	CMat<_Dty>& operator+=(CMat<_Dty>& a, const CMat<_Dty>& b)
+	Matrix<_Dty>& operator+=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
 		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator + doesn't match.");
 
@@ -22,7 +22,7 @@ namespace CMat
 	}
 
 	template<class _Dty>
-	CMat<_Dty>& operator-=(CMat<_Dty>& a, const CMat<_Dty>& b)
+	Matrix<_Dty>& operator-=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
 		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator - doesn't match.");
 
@@ -38,7 +38,7 @@ namespace CMat
 	}
 
 	template<class _Dty>
-	CMat<_Dty>& operator*=(CMat<_Dty>& a, const CMat<_Dty>& b)
+	Matrix<_Dty>& operator*=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
 		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator * doesn't match.");
 
@@ -54,7 +54,7 @@ namespace CMat
 	}
 
 	template<class _Dty>
-	CMat<_Dty>& operator/=(CMat<_Dty>& a, const CMat<_Dty>& b)
+	Matrix<_Dty>& operator/=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
 		if (a.shape != b.shape) throw std::invalid_argument("Two shape of operand for operator / doesn't match.");
 
@@ -70,22 +70,22 @@ namespace CMat
 	}
 
 	template<class _Dty>
-	CMat<_Dty> operator+(CMat<_Dty> a, const CMat<_Dty>& b) { return a += b; }
+	Matrix<_Dty> operator+(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a += b; }
 	template<class _Dty>
-	CMat<_Dty> operator-(CMat<_Dty> a, const CMat<_Dty>& b) { return a -= b; }
+	Matrix<_Dty> operator-(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a -= b; }
 	template<class _Dty>
-	CMat<_Dty> operator*(CMat<_Dty> a, const CMat<_Dty>& b) { return a *= b; }
+	Matrix<_Dty> operator*(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a *= b; }
 	template<class _Dty>
-	CMat<_Dty> operator/(CMat<_Dty> a, const CMat<_Dty>& b) { return a /= b; }
+	Matrix<_Dty> operator/(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a /= b; }
 
 
 	template<class _Dty>
-	inline CMat<_Dty> matmul(const CMat<_Dty>& a, const CMat<_Dty>& b) {
+	inline Matrix<_Dty> matmul(const Matrix<_Dty>& a, const Matrix<_Dty>& b) {
 		if (a.shape.cols != b.shape.rows)
 			throw std::invalid_argument("Number of cols for a and number of rows for b doesn't match.");
 
-		const CMat<_Dty> bt = b.transposed();
-		CMat<_Dty> c(MatShape{ a.shape.rows, b.shape.cols });
+		const Matrix<_Dty> bt = b.transposed();
+		Matrix<_Dty> c(MatShape{ a.shape.rows, b.shape.cols });
 
 		const _Dty* a_ptr = a.data();
 		_Dty* c_ptr = c.data();
