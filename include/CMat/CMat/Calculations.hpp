@@ -7,7 +7,7 @@ namespace CMat
 	template<class _Dty>
 	_Dty sum(const Matrix<_Dty>& x)
 	{
-		_Dty res;
+		_Dty res = 0;
 		const _Dty* ptr = x.data();
 
 		uint32_t i, j;

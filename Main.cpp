@@ -8,20 +8,32 @@
 
 void Main()
 {
-	CMat::Matrix<float> a = CMat::Random::rand<float>(CMat::MatShape{ 20, 1024 });
+	CMat::Matrix<float> a = CMat::Random::rand<float>(CMat::MatShape{ 1, 1024 });
 
 	NNCpp::Modules::Dense<float>fc(1024, 20);
 	NNCpp::Modules::ReLU<float>relu;
 
-	fc.forward(a, a);
-	relu.forward(a, a);
+	Console << fc.paramteres().size();
 
-	a = CMat::ones<float>(CMat::MatShape{ 20, 20 });
+	NNCpp::Optim::SGD<float> optim(fc.paramteres(), 0.001);
 
-	relu.backward(a, a);
-	fc.backward(a, a);
+	for (int32 i : step(1000))
+	{
 
-	Console << a;
+		fc.forward(a, a);
+		relu.forward(a, a);
+
+		Console << CMat::sum(a);
+
+		a -= CMat::onesLike(a);
+
+		//a = CMat::ones<float>(CMat::MatShape{ 20, 20 });
+		optim.zeroGrad();
+
+		relu.backward(a, a);
+		fc.backward(a, a);
+		optim.step();
+	}
 
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
