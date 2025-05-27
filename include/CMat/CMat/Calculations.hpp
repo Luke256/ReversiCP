@@ -41,4 +41,18 @@ namespace CMat
 		}
 		return res;
 	}
+
+	template<class _Dty>
+	inline Matrix<_Dty> pow(const Matrix<_Dty>& a, const _Dty exponent)
+	{
+		auto res = a;
+		_Dty* target = res.data();
+		const _Dty* ptr = a.data();
+		const _Dty* end = ptr + a.size();
+		while (ptr != end)
+		{
+			*target++ = std::pow(*ptr++, exponent);
+		}
+		return res;
+	}
 }

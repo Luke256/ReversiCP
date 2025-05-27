@@ -899,9 +899,6 @@
     <ClInclude Include="include\NNCpp\Modules\Dense.hpp">
       <Filter>include\NNCpp\Modules</Filter>
     </ClInclude>
-    <ClInclude Include="include\NNCpp\Modules\Core.hpp">
-      <Filter>include\NNCpp\Modules</Filter>
-    </ClInclude>
     <ClInclude Include="include\NNCpp\Modules.hpp">
       <Filter>include\NNCpp</Filter>
     </ClInclude>
@@ -925,6 +922,9 @@
     </ClInclude>
     <ClInclude Include="include\NNCpp\Optimizers.hpp">
       <Filter>include\NNCpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NNCpp\Modules\MSELoss.hpp">
+      <Filter>include\NNCpp\Modules</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

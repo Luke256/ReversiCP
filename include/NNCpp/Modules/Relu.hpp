@@ -1,18 +1,16 @@
 ﻿# pragma once
 
-# include "Core.hpp"
-
 namespace NNCpp::Modules
 {
 	template<class _Dty>
-	class ReLU : public Module<_Dty>
+	class ReLU
 	{
 	private:
 		CMat::Matrix<_Dty> mask;
 	public:
 		ReLU(){}
 
-		void forward(const CMat::Matrix<_Dty>& input, CMat::Matrix<_Dty>& output) override
+		void forward(const CMat::Matrix<_Dty>& input, CMat::Matrix<_Dty>& output)
 		{
 			output = input;
 			mask = CMat::Matrix<_Dty>(input.shape);
@@ -23,7 +21,7 @@ namespace NNCpp::Modules
 			}
 		}
 
-		void backward(const CMat::Matrix<_Dty>& input, CMat::Matrix<_Dty>& output) override
+		void backward(const CMat::Matrix<_Dty>& input, CMat::Matrix<_Dty>& output)
 		{
 			output = input * mask;
 		}

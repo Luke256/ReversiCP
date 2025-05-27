@@ -62,8 +62,7 @@ namespace CMat
 		auto cend(uint32_t row) { return cbegin(row) + shape.cols; }
 		const auto cend(uint32_t row) const { return cbegin(row) + shape.cols; }
 		
-		size_t size() { return m_data.size(); }
-
+		size_t size() const { return m_data.size(); }
 
 		inline Matrix& transpose()
 		{

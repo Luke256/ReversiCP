@@ -8,36 +8,42 @@
 
 void Main()
 {
-	CMat::Matrix<float> a = CMat::Random::rand<float>(CMat::MatShape{ 1, 1024 });
+	NNCpp::Modules::Dense<float>fc1(1024, 1);
+	//NNCpp::Modules::Dense<float>fc2(20, 1);
+	//NNCpp::Modules::ReLU<float>relu;
+	NNCpp::Modules::MSELoss<float>loss;
 
-	NNCpp::Modules::Dense<float>fc(1024, 20);
-	NNCpp::Modules::ReLU<float>relu;
+	auto y = CMat::ones<float>(CMat::MatShape{ 100, 1 });
 
-	Console << fc.paramteres().size();
+	auto p1 = fc1.parameters();
+	//auto p2 = fc2.parameters();
+	//p1.insert(p1.end(), p2.begin(), p2.end());
 
-	NNCpp::Optim::SGD<float> optim(fc.paramteres(), 0.001);
+	NNCpp::Optim::SGD<float> optim(p1, 0.001);
 
-	for (int32 i : step(1000))
+	for (int32 i : step(100))
 	{
+		CMat::Matrix<float> a = CMat::Random::rand<float>(CMat::MatShape{ 100, 1024 });
 
-		fc.forward(a, a);
-		relu.forward(a, a);
+		fc1.forward(a, a);
+		//relu.forward(a, a);
+		//fc2.forward(a, a);
+		float l;
+		loss.forward(a, y, l);
 
-		Console << CMat::sum(a);
+		Console << l;
 
-		a -= CMat::onesLike(a);
-
-		//a = CMat::ones<float>(CMat::MatShape{ 20, 20 });
 		optim.zeroGrad();
 
-		relu.backward(a, a);
-		fc.backward(a, a);
+		loss.backward(a);
+		//fc2.backward(a, a);
+		//relu.backward(a, a);
+		fc1.backward(a, a);
 		optim.step();
 	}
 
-	Window::Resize(AppData::Width, AppData::Height);
+	//Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
-
 	MyApp app;
 
 	app.add<Game>(U"Game");
