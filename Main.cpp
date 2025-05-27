@@ -8,7 +8,19 @@
 
 void Main()
 {
+	auto a = CMat::Random::norm<float>(CMat::MatShape{ 1024, 1024 });
+	auto b = CMat::Random::norm<float>(CMat::MatShape{ 1024, 1024 });
+
+	auto start = std::chrono::high_resolution_clock::now();
+	// Create a vector of unique_ptr to integers
+	auto c = CMat::matmul(a, b);
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+	Console << duration.count() << U" ms";
 	CMat::Random::seed(0);
+
+	c = CMat::matmul(CMat::Matrix<float>{ {1,2},{3,4} }, CMat::Matrix<float>{ {5,6},{7,8} });
+	Console << c;
 
 	CMat::Matrix<float> A = CMat::ones<float>(CMat::MatShape{ 100, 32 });
 	NNCpp::Modules::Dense<float>fc1(32, 32);

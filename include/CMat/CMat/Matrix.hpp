@@ -39,7 +39,9 @@ namespace CMat
 			}
 		}
 
-		Matrix(const MatShape& shape, _Dty x=0): m_data(shape.cols * shape.rows, x), shape(shape) {}
+		Matrix(const MatShape& shape, _Dty x = 0) : m_data(shape.cols* shape.rows, x), shape(shape) {}
+
+		Matrix(const MatShape& shape, _Dty* x) : m_data(x, x + shape.cols* shape.rows), shape(shape) {}
 
 		_Dty* data() { return m_data.data(); }
 		const _Dty* data() const { return m_data.data(); }
