@@ -21,17 +21,16 @@ namespace CMat
 		}
 		else if (a.shape.cols == b.shape.cols and b.shape.rows == 1)
 		{
-			const _Dty* val_ptr = b.data();
 			for (uint32 row = 0; row < a.shape.rows; ++row)
 			{
 				std::transform(
 					a.cbegin(row),
 					a.cend(row),
+					b.cbegin(),
 					a.begin(row),
-					[&val_ptr, &f, &options...](const auto& inValue) -> _Dty {
-						return f(inValue, *val_ptr, std::forward<AdditionalOptions>(options)...);
+					[&f, &options...](const auto& inValue1, const auto& inValue2) -> _Dty {
+						return f(inValue1, inValue2, std::forward<AdditionalOptions>(options)...);
 					});
-				val_ptr++;
 			}
 		}
 		else if (a.shape.rows == b.shape.rows and b.shape.cols == 1)

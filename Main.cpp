@@ -8,26 +8,29 @@
 
 void Main()
 {
-	NNCpp::Modules::Dense<float>fc1(1024, 1);
-	//NNCpp::Modules::Dense<float>fc2(20, 1);
-	//NNCpp::Modules::ReLU<float>relu;
+	CMat::Random::seed(0);
+
+	CMat::Matrix<float> A = CMat::ones<float>(CMat::MatShape{ 100, 32 });
+	NNCpp::Modules::Dense<float>fc1(32, 32);
+	NNCpp::Modules::Dense<float>fc2(32, 1);
+	NNCpp::Modules::ReLU<float>relu;
 	NNCpp::Modules::MSELoss<float>loss;
 
 	auto y = CMat::ones<float>(CMat::MatShape{ 100, 1 });
 
 	auto p1 = fc1.parameters();
-	//auto p2 = fc2.parameters();
-	//p1.insert(p1.end(), p2.begin(), p2.end());
+	auto p2 = fc2.parameters();
+	p1.insert(p1.end(), p2.begin(), p2.end());
 
-	NNCpp::Optim::SGD<float> optim(p1, 0.001);
+	NNCpp::Optim::SGD<float> optim(p1, 0.01);
 
-	for (int32 i : step(100))
+
+	for (int32 i : step(10))
 	{
-		CMat::Matrix<float> a = CMat::Random::rand<float>(CMat::MatShape{ 100, 1024 });
-
+		auto a = A;
 		fc1.forward(a, a);
-		//relu.forward(a, a);
-		//fc2.forward(a, a);
+		relu.forward(a, a);
+		fc2.forward(a, a);
 		float l;
 		loss.forward(a, y, l);
 
@@ -36,8 +39,8 @@ void Main()
 		optim.zeroGrad();
 
 		loss.backward(a);
-		//fc2.backward(a, a);
-		//relu.backward(a, a);
+		fc2.backward(a, a);
+		relu.backward(a, a);
 		fc1.backward(a, a);
 		optim.step();
 	}

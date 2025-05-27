@@ -917,7 +917,7 @@
     <ClInclude Include="include\NNCpp\Optimizers\Optimizer.hpp">
       <Filter>include\NNCpp\Optimizers</Filter>
     </ClInclude>
-    <ClInclude Include="include\NNCpp\Optimizers\SGD..hpp">
+    <ClInclude Include="include\NNCpp\Optimizers\SGD.hpp">
       <Filter>include\NNCpp\Optimizers</Filter>
     </ClInclude>
     <ClInclude Include="include\NNCpp\Optimizers.hpp">

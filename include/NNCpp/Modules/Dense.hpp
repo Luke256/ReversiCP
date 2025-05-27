@@ -31,7 +31,7 @@ namespace NNCpp::Modules
 		void backward(const CMat::Matrix<_Dty>& input, CMat::Matrix<_Dty>& output)
 		{
 			gb += CMat::sumRows(input);
-			gw += CMat::matmul(last_input.transpose(), input);
+			gw += CMat::matmul(last_input.transposed(), input);
 			output = CMat::matmul(output, w.transposed());
 		}
 
@@ -41,6 +41,11 @@ namespace NNCpp::Modules
 				{w.data(), gw.data(), w.size()},
 				{b.data(), gb.data(), b.size()}
 			};
+		}
+
+		void print()
+		{
+			Console << w;
 		}
 	};
 }

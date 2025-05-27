@@ -346,7 +346,7 @@
     <ClInclude Include="include\NNCpp\NNCpp.hpp" />
     <ClInclude Include="include\NNCpp\Optimizers.hpp" />
     <ClInclude Include="include\NNCpp\Optimizers\Optimizer.hpp" />
-    <ClInclude Include="include\NNCpp\Optimizers\SGD..hpp" />
+    <ClInclude Include="include\NNCpp\Optimizers\SGD.hpp" />
     <ClInclude Include="include\NNCpp\Utils\ParamInfo.hpp" />
     <ClInclude Include="Main.hpp" />
     <ClInclude Include="ReversiAgents\Agent.hpp" />
