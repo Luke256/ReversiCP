@@ -160,6 +160,9 @@
     <Filter Include="include\NNCpp\Optimizers">
       <UniqueIdentifier>{3cf68cb9-71dd-468e-aa05-b862bfcf93e1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="NNEvaluator">
+      <UniqueIdentifier>{71e7f822-5903-46a9-8dee-c65975286c74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -185,6 +188,9 @@
     </ClCompile>
     <ClCompile Include="codingame.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReversiAgents\LearnerAgent.cpp">
+      <Filter>ReversiAgents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -926,8 +932,17 @@
     <ClInclude Include="include\NNCpp\Modules\MSELoss.hpp">
       <Filter>include\NNCpp\Modules</Filter>
     </ClInclude>
+    <ClInclude Include="ReversiAgents\LearnerAgent.hpp">
+      <Filter>ReversiAgents</Filter>
+    </ClInclude>
+    <ClInclude Include="NNEvaluator\Learner.hpp">
+      <Filter>NNEvaluator</Filter>
+    </ClInclude>
     <ClInclude Include="include\NNCpp\Modules\SimpleNet.hpp">
       <Filter>include\NNCpp\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="NNEvaluator\EvalPattern.hpp">
+      <Filter>NNEvaluator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

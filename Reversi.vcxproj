@@ -120,6 +120,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="ReversiAgents\AlphaBetaAgent.cpp" />
     <ClCompile Include="ReversiAgents\GreedyAgent.cpp" />
+    <ClCompile Include="ReversiAgents\LearnerAgent.cpp" />
     <ClCompile Include="ReversiAgents\MinMaxAgent.cpp" />
     <ClCompile Include="ReversiEngine.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -350,10 +351,13 @@
     <ClInclude Include="include\NNCpp\Optimizers\SGD.hpp" />
     <ClInclude Include="include\NNCpp\Utils\ParamInfo.hpp" />
     <ClInclude Include="Main.hpp" />
+    <ClInclude Include="NNEvaluator\EvalPattern.hpp" />
+    <ClInclude Include="NNEvaluator\Learner.hpp" />
     <ClInclude Include="ReversiAgents\Agent.hpp" />
     <ClInclude Include="ReversiAgents\AlphaBetaAgent.hpp" />
     <ClInclude Include="ReversiAgents\HumanAgent.hpp" />
     <ClInclude Include="ReversiAgents\GreedyAgent.hpp" />
+    <ClInclude Include="ReversiAgents\LearnerAgent.hpp" />
     <ClInclude Include="ReversiAgents\MinMaxAgent.hpp" />
     <ClInclude Include="ReversiAgents\RandomAgent.hpp" />
     <ClInclude Include="ReversiEngine.hpp" />
