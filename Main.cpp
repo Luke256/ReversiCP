@@ -8,42 +8,22 @@
 
 void Main()
 {
-	auto a = CMat::Random::norm<float>(CMat::MatShape{ 1024, 1024 });
-	auto b = CMat::Random::norm<float>(CMat::MatShape{ 1024, 1024 });
-
-	auto start = std::chrono::high_resolution_clock::now();
-	// Create a vector of unique_ptr to integers
-	auto c = CMat::matmul(a, b);
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-	Console << duration.count() << U" ms";
 	CMat::Random::seed(0);
 
-	c = CMat::matmul(CMat::Matrix<float>{ {1,2},{3,4} }, CMat::Matrix<float>{ {5,6},{7,8} });
-	Console << c;
+	CMat::Matrix<float> A = CMat::Random::norm<float>(CMat::MatShape{ 100, 32 });
+	CMat::Matrix<float> y = CMat::ones<float>(CMat::MatShape{ 100, 1 });
 
-	CMat::Matrix<float> A = CMat::ones<float>(CMat::MatShape{ 100, 32 });
-	NNCpp::Modules::Dense<float>fc1(32, 32);
-	NNCpp::Modules::Dense<float>fc2(32, 1);
-	NNCpp::Modules::ReLU<float>relu;
-	NNCpp::Modules::MSELoss<float>loss;
+	auto model = NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>>(32, 32, 1);
 
-	auto y = CMat::ones<float>(CMat::MatShape{ 100, 1 });
+	auto loss = NNCpp::Modules::MSELoss<float>();
 
-	auto p1 = fc1.parameters();
-	auto p2 = fc2.parameters();
-	p1.insert(p1.end(), p2.begin(), p2.end());
+	NNCpp::Optim::SGD<float> optim(model.parameters(), 0.01);
 
-	NNCpp::Optim::SGD<float> optim(p1, 0.01);
-
-
-	for (int32 i : step(10))
+	for (int32 i : step(200))
 	{
 		auto a = A;
-		fc1.forward(a, a);
-		relu.forward(a, a);
-		fc2.forward(a, a);
 		float l;
+		model.forward(a, a);
 		loss.forward(a, y, l);
 
 		Console << l;
@@ -51,9 +31,8 @@ void Main()
 		optim.zeroGrad();
 
 		loss.backward(a);
-		fc2.backward(a, a);
-		relu.backward(a, a);
-		fc1.backward(a, a);
+		model.backward(a, a);
+
 		optim.step();
 	}
 

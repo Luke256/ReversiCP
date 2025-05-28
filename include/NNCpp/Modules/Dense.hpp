@@ -42,10 +42,5 @@ namespace NNCpp::Modules
 				{b.data(), gb.data(), b.size()}
 			};
 		}
-
-		void print()
-		{
-			Console << w;
-		}
 	};
 }
