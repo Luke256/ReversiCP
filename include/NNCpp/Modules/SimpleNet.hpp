@@ -30,7 +30,7 @@ namespace NNCpp::Modules
 			d1.backward(output, output);
 		}
 
-		NNCpp::Utils::ParamInfoList<_Dty> parameters()
+		NNCpp::Utils::ParamInfoList<_Dty> parameters() 
 		{
 			NNCpp::Utils::ParamInfoList<_Dty>res = d1.parameters();
 			NNCpp::Utils::ParamInfoList<_Dty>p2 = d2.parameters();

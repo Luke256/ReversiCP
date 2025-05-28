@@ -12,6 +12,7 @@ namespace NNCpp::Optim
 		Utils::ParamInfoList<_Dty> m_params;
 		_Dty m_lr;
 	public:
+		SGD(){}
 		SGD(const Utils::ParamInfoList<_Dty>& params, _Dty lr = 1e-4) : m_params(params), m_lr(lr)
 		{}
 

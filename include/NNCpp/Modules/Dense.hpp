@@ -13,7 +13,7 @@ namespace NNCpp::Modules
 		CMat::Matrix<_Dty> w, b, last_input, gw, gb;
 	public:
 		Dense(uint32_t input_size, uint32_t output_size) :
-			w(CMat::Random::norm<_Dty>(CMat::MatShape{ input_size, output_size }, 0.0, 0.01)),
+			w(CMat::Random::norm<_Dty>(CMat::MatShape{ input_size, output_size }, static_cast<_Dty>(0.0), static_cast<_Dty>(0.01))),
 			b(CMat::zeros<_Dty>(CMat::MatShape{ 1, output_size })),
 			gw(CMat::zeros<_Dty>(CMat::MatShape{ input_size, output_size })),
 			gb(CMat::zeros<_Dty>(CMat::MatShape{ 1, output_size }))
@@ -35,7 +35,7 @@ namespace NNCpp::Modules
 			output = CMat::matmul(output, w.transposed());
 		}
 
-		NNCpp::Utils::ParamInfoList<_Dty> parameters()
+		NNCpp::Utils::ParamInfoList<_Dty> parameters() 
 		{
 			return {
 				{w.data(), gw.data(), w.size()},

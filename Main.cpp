@@ -5,10 +5,13 @@
 # include "include/CMat/CMat.hpp"
 # include "include/NNCpp/NNCpp.hpp"
 
+# include "NNEvaluator/Learner.hpp"
 
 void Main()
 {
 	CMat::Random::seed(0);
+
+	auto a = NNEvaluator::Learner();
 
 	CMat::Matrix<float> A = CMat::Random::norm<float>(CMat::MatShape{ 100, 32 });
 	CMat::Matrix<float> y = CMat::ones<float>(CMat::MatShape{ 100, 1 });
