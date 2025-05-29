@@ -50,9 +50,17 @@ namespace NNEvaluator
 			return *tmp.data();
 		}
 
-		float backward(CMat::Matrix<float>& input)
+		void backward(CMat::Matrix<float>& input)
 		{
-
+			CMat::Matrix<float>tmp, pin(CMat::MatShape{1, 1});
+			sigmoid.backward(input, tmp);
+			integrate.backward(tmp, tmp);
+			float* ptr = tmp.data();
+			for (auto& pattern : patterns)
+			{
+				*pin.data() = *ptr;
+				pattern.net.backward(pin, pin);
+			}
 		}
 
 		CMat::Matrix<float> maskState2Matrix(const ReversiSummary& state, const uint64_t mask)
