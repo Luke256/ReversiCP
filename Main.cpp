@@ -9,35 +9,13 @@
 
 void Main()
 {
-	CMat::Random::seed(0);
+	CMat::Random::seed(std::time(nullptr));
 
-	auto a = NNEvaluator::Learner();
+	Reversi::ReversiEngine engine;
+	engine.reset();
 
-	CMat::Matrix<float> A = CMat::Random::norm<float>(CMat::MatShape{ 100, 32 });
-	CMat::Matrix<float> y = CMat::ones<float>(CMat::MatShape{ 100, 1 });
-
-	auto model = NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>>(32, 32, 1);
-
-	auto loss = NNCpp::Modules::MSELoss<float>();
-
-	NNCpp::Optim::SGD<float> optim(model.parameters(), 0.01);
-
-	for (int32 i : step(200))
-	{
-		auto a = A;
-		float l;
-		model.forward(a, a);
-		loss.forward(a, y, l);
-
-		Console << l;
-
-		optim.zeroGrad();
-
-		loss.backward(a);
-		model.backward(a, a);
-
-		optim.step();
-	}
+	auto learner = NNEvaluator::Learner();
+	Console << learner.eval(engine);
 
 	//Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);

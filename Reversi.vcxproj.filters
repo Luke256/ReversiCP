@@ -944,5 +944,8 @@
     <ClInclude Include="NNEvaluator\EvalPattern.hpp">
       <Filter>NNEvaluator</Filter>
     </ClInclude>
+    <ClInclude Include="include\NNCpp\Modules\Sigmoid.hpp">
+      <Filter>include\NNCpp\Modules</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

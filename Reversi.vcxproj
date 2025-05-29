@@ -344,6 +344,7 @@
     <ClInclude Include="include\NNCpp\Modules\Dense.hpp" />
     <ClInclude Include="include\NNCpp\Modules\MSELoss.hpp" />
     <ClInclude Include="include\NNCpp\Modules\Relu.hpp" />
+    <ClInclude Include="include\NNCpp\Modules\Sigmoid.hpp" />
     <ClInclude Include="include\NNCpp\Modules\SimpleNet.hpp" />
     <ClInclude Include="include\NNCpp\NNCpp.hpp" />
     <ClInclude Include="include\NNCpp\Optimizers.hpp" />
