@@ -15,12 +15,11 @@ namespace CMat
 	{
 	private:
 		std::vector<_Dty> m_data;
-		MatShape m_strides;
 	public:
 		MatShape shape;
 
-		Matrix() : shape(0, 0), m_strides(0, 0) {}
-		Matrix(const std::initializer_list<_Dty>& init) : m_data(init.begin(), init.end()), shape(1, init.size()), m_strides(init.size(), 1) {}
+		Matrix() : shape(0, 0) {}
+		Matrix(const std::initializer_list<_Dty>& init) : m_data(init.begin(), init.end()), shape(1, init.size()) {}
 
 		Matrix(const std::initializer_list<std::initializer_list<_Dty>>& init)
 		{
