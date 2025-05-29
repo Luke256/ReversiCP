@@ -55,4 +55,18 @@ namespace CMat
 		}
 		return res;
 	}
+
+	template<class _Dty>
+	inline Matrix<_Dty> exp(const Matrix<_Dty>& a)
+	{
+		auto res = a;
+		_Dty* target = res.data();
+		const _Dty* ptr = a.data();
+		const _Dty* end = ptr + a.size();
+		while (ptr != end)
+		{
+			*target++ = std::exp(*ptr++);
+		}
+		return res;
+	}
 }
