@@ -45,6 +45,16 @@ namespace CMat
 		}
 	}
 
+	template<class _Dty, class Function, class... AdditionalOptions>
+	void __applyOperation(Matrix<_Dty>& a, const _Dty& b, const Function& f, AdditionalOptions ...options)
+	{
+		std::transform(a.cbegin(), a.cend(),
+			a.begin(),
+			[&f, &b, &options...](const auto& inValue1) -> _Dty {
+			return f(inValue1, b, std::forward<AdditionalOptions>(options)...);
+			});
+	}
+
 	template<class _Dty>
 	Matrix<_Dty>& operator+=(Matrix<_Dty>& a, const Matrix<_Dty>& b)
 	{
@@ -74,6 +84,34 @@ namespace CMat
 	}
 
 	template<class _Dty>
+	Matrix<_Dty>& operator+=(Matrix<_Dty>& a, const _Dty& b)
+	{
+		__applyOperation(a, b, std::plus<_Dty>());
+		return a;
+	}
+
+	template<class _Dty>
+	Matrix<_Dty>& operator-=(Matrix<_Dty>& a, const _Dty& b)
+	{
+		__applyOperation(a, b, std::minus<_Dty>());
+		return a;
+	}
+
+	template<class _Dty>
+	Matrix<_Dty>& operator*=(Matrix<_Dty>& a, const _Dty& b)
+	{
+		__applyOperation(a, b, std::multiplies<_Dty>());
+		return a;
+	}
+
+	template<class _Dty>
+	Matrix<_Dty>& operator/=(Matrix<_Dty>& a, const _Dty& b)
+	{
+		__applyOperation(a, b, std::divides<_Dty>());
+		return a;
+	}
+
+	template<class _Dty>
 	Matrix<_Dty> operator+(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a += b; }
 	template<class _Dty>
 	Matrix<_Dty> operator-(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a -= b; }
@@ -81,6 +119,14 @@ namespace CMat
 	Matrix<_Dty> operator*(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a *= b; }
 	template<class _Dty>
 	Matrix<_Dty> operator/(Matrix<_Dty> a, const Matrix<_Dty>& b) { return a /= b; }
+	template<class _Dty>
+	Matrix<_Dty> operator+(Matrix<_Dty> a, const _Dty& b) { return a += b; }
+	template<class _Dty>
+	Matrix<_Dty> operator-(Matrix<_Dty> a, const _Dty& b) { return a -= b; }
+	template<class _Dty>
+	Matrix<_Dty> operator*(Matrix<_Dty> a, const _Dty& b) { return a *= b; }
+	template<class _Dty>
+	Matrix<_Dty> operator/(Matrix<_Dty> a, const _Dty& b) { return a /= b; }
 
 	template<class _Dty>
 	inline Matrix<_Dty> matmul(const Matrix<_Dty>& a, const Matrix<_Dty>& b) {
