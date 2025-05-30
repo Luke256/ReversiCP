@@ -94,14 +94,14 @@ namespace NNEvaluator
 		{
 			stateBuffer.push_back(engine.getTupleState());
 			float scoref = forward(stateBuffer.back());
-			return static_cast<int32_t>(scoref * 64);
+			return static_cast<int32_t>(scoref * 128 - 64);
 		}
 
 		/// @brief 今まで評価した盤面のスコアがscoreであるとして学習を行う
 		/// @param score 盤面スコア
 		void step(uint32_t score)
 		{
-			const auto t = CMat::Matrix<float>{ {1, 1}, score / 64.0f };
+			const auto t = CMat::Matrix<float>{ {1, 1}, score / 64.0f + 0.5f };
 			for (const ReversiSummary& state : stateBuffer)
 			{
 				auto y = CMat::Matrix<float>{ {1, 1}, forward(state) };
