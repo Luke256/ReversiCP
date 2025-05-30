@@ -12,5 +12,14 @@ namespace CMat
 
 		bool operator==(const MatShape& a) { return rows == a.rows and cols == a.cols; }
 		bool operator!=(const MatShape& a) { return rows != a.rows or cols != a.cols; }
+
+#ifdef SIV3D_INCLUDED
+
+		friend void Formatter(FormatData& formatData, const MatShape& value)
+		{
+			formatData.string += U"({}, {})"_fmt(value.rows, value.cols);
+		}
+
+#endif
 	};
 };

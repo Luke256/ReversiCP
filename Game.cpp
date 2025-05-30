@@ -5,6 +5,7 @@
 # include "ReversiAgents/GreedyAgent.hpp"
 # include "ReversiAgents/MinMaxAgent.hpp"
 # include "ReversiAgents/AlphaBetaAgent.hpp"
+# include "ReversiAgents/LearnerAgent.hpp"
 
 void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
 {
@@ -13,6 +14,7 @@ void genAgents(Array<std::shared_ptr<ReversiAgent>>& agents)
 	agents << std::make_shared<GreedyAgent>();
 	agents << std::make_shared<MinMaxAgent>();
 	agents << std::make_shared<AlphaBetaAgent>();
+	agents << std::make_shared<LearnerAgent>();
 }
 
 
@@ -85,6 +87,14 @@ void Game::draw() const
 
 void Game::reset()
 {
+	if (engine.isFinished())
+	{
+		if (not engine.isBlackTurn()) engine.pass();
+		p1agents[*p1Info.type.selectedItemIndex]->reviewGame(engine);
+		engine.pass();
+		p2agents[*p2Info.type.selectedItemIndex]->reviewGame(engine);
+	}
+
 	std::vector<int32_t>arr(64);
 	engine.reset();
 	engine.getBoard(arr);

@@ -1,4 +1,7 @@
-﻿#include "LearnerAgent.hpp"
+﻿# include "LearnerAgent.hpp"
+# include "../NNEvaluator/Learner.hpp"
+
+NNEvaluator::Learner LearnerAgent::learner;
 
 LearnerAgent::LearnerAgent()
 {
@@ -8,8 +11,9 @@ LearnerAgent::LearnerAgent()
 LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 {
 	callCnt = 0;
-	Reversi::ReversiEngine env = engine;
-	if (not env.isBlackTurn()) env.swapBW(); // 黒を扱いたい
+	Reversi::ReversiEngine env = engine, bestEnv;
+	isBlack = env.isBlackTurn();
+	if (not isBlack) env.swapBW(); // 黒を扱いたい
 	const uint64_t prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
 	const int32_t SEARCH_DEPTH = 6;
 
@@ -30,6 +34,7 @@ LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 
 			if (alpha < score)
 			{
+				bestEnv = env;
 				alpha = score;
 				best = idx;
 			}
@@ -39,11 +44,20 @@ LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 		transTable.swap(transTablePrev);
 		transTable.clear();
 	}
+	learner.addTarget(bestEnv.getTupleState(), isBlack);
 	return { best & 7, best >> 3 };
 }
 
 void LearnerAgent::reset_child()
 {
+}
+
+void LearnerAgent::reviewGame(const Reversi::ReversiEngine& engine)
+{
+	Reversi::ReversiEngine env = engine;
+	assert(env.isBlackTurn() == isBlack);
+	if (not isBlack) env.swapBW(); // 黒を扱いたい
+	learner.step(env.getNBlacks() - env.getNWhites(), isBlack);
 }
 
 int32_t LearnerAgent::negaAlpha(Reversi::ReversiEngine& engine, int32_t depth, bool passed, int32_t alpha, int32_t beta)
@@ -80,37 +94,7 @@ int32_t LearnerAgent::negaAlpha(Reversi::ReversiEngine& engine, int32_t depth, b
 	return transTable[engine.getTupleState()] = maxScore;
 }
 
-inline int32_t LearnerAgent::eval(const Reversi::ReversiEngine& engine) const
+inline int32_t LearnerAgent::eval(const Reversi::ReversiEngine& engine)
 {
-	uint64_t black = engine.getBlacks(), white = engine.getWhites();
-	int32_t score = 0;
-	score += rowValues[(0 << 8) + ((black & 0xFF00000000000000) >> 56)];
-	score += rowValues[(1 << 8) + ((black & 0x00FF000000000000) >> 48)];
-	score += rowValues[(2 << 8) + ((black & 0x0000FF0000000000) >> 40)];
-	score += rowValues[(3 << 8) + ((black & 0x000000FF00000000) >> 32)];
-	score += rowValues[(4 << 8) + ((black & 0x00000000FF000000) >> 24)];
-	score += rowValues[(5 << 8) + ((black & 0x0000000000FF0000) >> 16)];
-	score += rowValues[(6 << 8) + ((black & 0x000000000000FF00) >> 8)];
-	score += rowValues[(7 << 8) + ((black & 0x00000000000000FF))];
-	score -= rowValues[(0 << 8) + ((white & 0xFF00000000000000) >> 56)];
-	score -= rowValues[(1 << 8) + ((white & 0x00FF000000000000) >> 48)];
-	score -= rowValues[(2 << 8) + ((white & 0x0000FF0000000000) >> 40)];
-	score -= rowValues[(3 << 8) + ((white & 0x000000FF00000000) >> 32)];
-	score -= rowValues[(4 << 8) + ((white & 0x00000000FF000000) >> 24)];
-	score -= rowValues[(5 << 8) + ((white & 0x0000000000FF0000) >> 16)];
-	score -= rowValues[(6 << 8) + ((white & 0x000000000000FF00) >> 8)];
-	score -= rowValues[(7 << 8) + ((white & 0x00000000000000FF))];
-
-	if (not engine.isBlackTurn()) score = -score;
-	if (score > 0) // 四捨五入のため
-		score += 128;
-	else
-		score -= 128;
-	score /= 256; // 生の評価値は最終石差の256倍なので、256で割る
-	if (score > 64) score = 64; // 評価値を[-64, 64] に収める
-	else if (score < -64) score = -64;
-
-	score += std::popcount(engine.getLegals());
-
-	return score;
+	return learner.eval(engine);
 }

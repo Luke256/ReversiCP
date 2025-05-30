@@ -2,22 +2,10 @@
 # include "Game.hpp"
 # include "CodeExpander.hpp"
 
-# include "include/CMat/CMat.hpp"
-# include "include/NNCpp/NNCpp.hpp"
-
-# include "NNEvaluator/Learner.hpp"
 
 void Main()
 {
-	CMat::Random::seed(std::time(nullptr));
-
-	Reversi::ReversiEngine engine;
-	engine.reset();
-
-	auto learner = NNEvaluator::Learner();
-	Console << learner.eval(engine);
-
-	//Window::Resize(AppData::Width, AppData::Height);
+	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
 	MyApp app;
 

@@ -18,9 +18,9 @@ namespace CMat
 
 	namespace Random
 	{
-		XorShift random;
+		static XorShift random;
 
-		void seed(uint32_t seed) { random.initrand(seed); }
+		inline void seed(uint32_t seed) { random.initrand(seed); }
 
 		template<class _Dty>
 		Matrix<_Dty> rand(MatShape shape)

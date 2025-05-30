@@ -27,6 +27,7 @@ private:
 		U"Greedy",
 		U"MinMax",
 		U"AlphaBeta",
+		U"Learner",
 	};
 
 	const int32 boardW = AppData::Width / 2 - 20;

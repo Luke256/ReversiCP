@@ -13,6 +13,7 @@ public:
 	}
 	virtual Pos play(const Reversi::ReversiEngine &engine) = 0;
 	virtual void reset_child() = 0;
+	virtual void reviewGame([[maybe_unused]] const Reversi::ReversiEngine &engine) {}
 	void reset()
 	{
 		m_abort = false;

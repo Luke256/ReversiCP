@@ -30,7 +30,7 @@ namespace NNEvaluator
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>> integrate;
 		NNCpp::Modules::Sigmoid<float> sigmoid;
 
-		std::vector<ReversiSummary> stateBuffer;
+		std::vector<ReversiSummary> stateBufferB, stateBufferW;
 		NNCpp::Modules::MSELoss<float>loss;
 		NNCpp::Optim::SGD<float> optim;
 
@@ -52,13 +52,13 @@ namespace NNEvaluator
 
 		void backward(CMat::Matrix<float>& input)
 		{
-			CMat::Matrix<float>tmp, pin(CMat::MatShape{1, 1});
+			CMat::Matrix<float>tmp, pin;
 			sigmoid.backward(input, tmp);
 			integrate.backward(tmp, tmp);
 			float* ptr = tmp.data();
 			for (auto& pattern : patterns)
 			{
-				*pin.data() = *ptr;
+				pin = CMat::Matrix<float>({ 1, 1 }, *ptr++);
 				pattern.net.backward(pin, pin);
 			}
 		}
@@ -87,31 +87,50 @@ namespace NNEvaluator
 				auto param = pattern.net.parameters();
 				p.insert(p.end(), param.begin(), param.end());
 			}
-			optim = NNCpp::Optim::SGD<float>(p, 0.0001f);
+			optim = NNCpp::Optim::SGD<float>(p, 0.01f);
 		}
 
 		int32_t eval(const Reversi::ReversiEngine& engine)
 		{
-			stateBuffer.push_back(engine.getTupleState());
-			float scoref = forward(stateBuffer.back());
+			float scoref = forward(engine.getTupleState());
 			return static_cast<int32_t>(scoref * 128 - 64);
 		}
 
-		/// @brief 今まで評価した盤面のスコアがscoreであるとして学習を行う
-		/// @param score 盤面スコア
-		void step(uint32_t score)
+		void addTarget(const ReversiSummary& state, bool isBlack)
 		{
-			const auto t = CMat::Matrix<float>{ {1, 1}, score / 64.0f + 0.5f };
+			auto& stateBuffer = isBlack ? stateBufferB : stateBufferW;
+			stateBuffer.push_back(state);
+		}
+
+		/// @brief 今まで登録した盤面のスコアがscoreであるとして学習を行う
+		/// @param score 盤面スコア
+		void step(int32_t score, bool isBlack)
+		{
+			auto& stateBuffer = isBlack ? stateBufferB : stateBufferW;
+			const auto t = CMat::Matrix<float>{ {1, 1}, score / 128.0f + 0.5f };
+			auto cnt = stateBuffer.size();
 			for (const ReversiSummary& state : stateBuffer)
 			{
-				auto y = CMat::Matrix<float>{ {1, 1}, forward(state) };
-				float l;
-				loss.forward(y, t, l);
+				--cnt;
 
-				optim.zeroGrad();
-				loss.backward(y);
-				backward(y);
-				optim.step();
+				for (int32_t i = 0; i < (cnt ? 1 : 1000); ++i)
+				{
+					auto y = CMat::Matrix<float>{ {1, 1}, forward(state) };
+					float l;
+					loss.forward(y, t, l);
+
+					if (i == 0) Console << U"y: " << *y.data() << U" / t: " << *t.data() << U" / loss:" << l;
+
+					optim.zeroGrad();
+					loss.backward(y);
+					backward(y);
+					optim.step();
+					if (l < 0.00001 and cnt == 0)
+					{
+						Console << U"Optimized for {} times"_fmt(i + 1);
+						break;
+					}
+				}
 			}
 			stateBuffer.clear();
 		}

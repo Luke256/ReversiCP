@@ -1,15 +1,20 @@
 ﻿# pragma once
 
 # include "Agent.hpp"
+# include "../NNEvaluator/Learner.hpp"
 
 # include <unordered_map>
+
 
 class LearnerAgent : public ReversiAgent
 {
 public:
+	static NNEvaluator::Learner learner;
+
 	LearnerAgent();
 	Pos play(const Reversi::ReversiEngine& engine) override;
 	void reset_child() override;
+	void reviewGame(const Reversi::ReversiEngine& engine) override;
 private:
 	struct LegalState
 	{
@@ -41,6 +46,7 @@ private:
 	const std::vector<int32_t>rowValues = _initRowValues();
 	const int32_t MAX_CALL_CNT = 100000;
 
+
 	std::vector<int32_t> _initRowValues()
 	{
 		//Grid<int32_t>res{ 8, (1 << 8) };
@@ -64,8 +70,7 @@ private:
 
 	int32_t negaAlpha(Reversi::ReversiEngine& engine, int32_t depth, bool passed, int32_t alpha, int32_t beta);
 
-	inline int32_t eval(const Reversi::ReversiEngine& engine) const;
-
+	inline int32_t eval(const Reversi::ReversiEngine& engine);
 
 	/// @brief 合法手をざっとした評価の高い順に並べて返します
 	/// @param engine リバーシエンジン
@@ -108,5 +113,6 @@ private:
 
 	int32_t callCnt;
 	std::unordered_map<std::tuple<uint64_t, uint64_t, bool>, int32_t, Reversi::TupleHash> transTable, transTablePrev;
+	bool isBlack;
 	//HashTable<std::tuple<uint64_t, uint64_t, bool>, int32_t> transTable, transTablePrev;
 };
