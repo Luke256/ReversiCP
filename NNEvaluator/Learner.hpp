@@ -34,6 +34,7 @@ namespace NNEvaluator
 		NNCpp::Modules::MSELoss<float>loss;
 		NNCpp::Optim::SGD<float> optim;
 
+		// No Cache
 		float forward(const ReversiSummary& state)
 		{
 			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size()) });
@@ -41,7 +42,7 @@ namespace NNEvaluator
 			CMat::Matrix<float> tmp;
 			for (auto& pattern : patterns)
 			{
-				pattern.net.forward(maskState2Matrix(state, pattern.mask), tmp);
+				pattern.forward(state, tmp);
 				*targetPtr++ = *tmp.data();
 			}
 
@@ -63,23 +64,8 @@ namespace NNEvaluator
 			}
 		}
 
-		CMat::Matrix<float> maskState2Matrix(const ReversiSummary& state, const uint64_t mask)
-		{
-			CMat::Matrix<float>res{ CMat::MatShape{1, static_cast<uint32_t>(std::popcount(mask))}};
-			float* ptr = res.data();
-			uint64_t pointer = 0x8000000000000000;
-			for (; pointer; pointer >>= 1)
-			{
-				if ((mask & pointer) == 0) continue;
-				if (std::get<0>(state) & pointer) *ptr = 1.0f;
-				else if (std::get<1>(state) & pointer) *ptr = -1.0f;
-				ptr++;
-			}
-			return res;
-		}
-
 	public:
-		Learner(): integrate(static_cast<uint32_t>(patterns.size()), 32, 1)
+		Learner(): integrate(static_cast<uint32_t>(patterns.size()), 16, 1)
 		{
 			NNCpp::Utils::ParamInfoList<float> p;
 			for (auto& pattern : patterns)
@@ -88,10 +74,24 @@ namespace NNEvaluator
 				p.insert(p.end(), param.begin(), param.end());
 			}
 			optim = NNCpp::Optim::SGD<float>(p, 0.01f);
+
+			preCalsPatterns();
 		}
 
 		int32_t eval(const Reversi::ReversiEngine& engine)
 		{
+			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size()) });
+			float* targetPtr = pScores.data();
+			CMat::Matrix<float> tmp;
+			for (auto& pattern : patterns)
+			{
+				*targetPtr++ = pattern.eval(engine);
+			}
+
+			integrate.forward(pScores, tmp);
+			sigmoid.forward(tmp, tmp);
+			return static_cast<int32_t>(*tmp.data() * 128 - 64);
+
 			float scoref = forward(engine.getTupleState());
 			return static_cast<int32_t>(scoref * 128 - 64);
 		}
@@ -133,6 +133,15 @@ namespace NNEvaluator
 				}
 			}
 			stateBuffer.clear();
+			preCalsPatterns();
+		}
+
+		void preCalsPatterns()
+		{
+			for (auto& pattern : patterns)
+			{
+				pattern.preCalc();
+			}
 		}
 	};
 }
