@@ -15,7 +15,7 @@ LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 	isBlack = env.isBlackTurn();
 	if (not isBlack) env.swapBW(); // 黒を扱いたい
 	const uint64_t prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
-	const int32_t SEARCH_DEPTH = 5;
+	const int32_t SEARCH_DEPTH = 3;
 
 	int32_t best = -1, score, alpha = -inf, beta = inf, depth;
 	std::vector<LegalState> legals;

@@ -28,7 +28,7 @@ namespace NNEvaluator
 		};
 
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>> integrate;
-		NNCpp::Modules::Sigmoid<float> sigmoid;
+		//NNCpp::Modules::Sigmoid<float> sigmoid;
 
 		std::vector<ReversiSummary> stateBufferB, stateBufferW;
 		NNCpp::Modules::MSELoss<float>loss;
@@ -47,16 +47,16 @@ namespace NNEvaluator
 			}
 
 			integrate.forward(pScores, tmp);
-			sigmoid.forward(tmp, tmp);
+			//sigmoid.forward(tmp, tmp);
 			return *tmp.data();
 		}
 
 		void backward(CMat::Matrix<float>& input)
 		{
-			CMat::Matrix<float>tmp, pin;
-			sigmoid.backward(input, tmp);
-			integrate.backward(tmp, tmp);
-			float* ptr = tmp.data();
+			CMat::Matrix<float>pin;
+			//sigmoid.backward(input, tmp);
+			integrate.backward(input, input);
+			float* ptr = input.data();
 			for (auto& pattern : patterns)
 			{
 				pin = CMat::Matrix<float>({ 1, 1 }, *ptr++);
@@ -89,11 +89,8 @@ namespace NNEvaluator
 			}
 
 			integrate.forward(pScores, tmp);
-			sigmoid.forward(tmp, tmp);
+			//sigmoid.forward(tmp, tmp);
 			return static_cast<int32_t>(*tmp.data() * 128 - 64);
-
-			float scoref = forward(engine.getTupleState());
-			return static_cast<int32_t>(scoref * 128 - 64);
 		}
 
 		void addTarget(const ReversiSummary& state, bool isBlack)
