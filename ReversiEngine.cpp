@@ -180,10 +180,15 @@ namespace Reversi
 		m_blackTurn = blackTurn;
 	}
 
-	void ReversiEngine::swapBW()
+	void ReversiEngine::swapBW(bool strict)
 	{
 		std::swap(m_blacks, m_whites);
 		m_blackTurn = !m_blackTurn;
+		if (strict)
+		{
+			m_blacks = reverse_bits(m_blacks);
+			m_whites = reverse_bits(m_whites);
+		}
 	}
 
 	bool ReversiEngine::isBlackTurn() const

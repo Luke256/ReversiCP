@@ -42,6 +42,12 @@ namespace Reversi
 		uint64_t pos2bit(uint32_t x, uint32_t y) const;
 
 		uint64_t transfer(uint64_t put, uint32_t dir) const;
+		inline uint64_t reverse_bits(uint64_t n) {
+			n = ((n & 0xAAAAAAAAAAAAAAAAULL) >> 1) | ((n & 0x5555555555555555ULL) << 1);
+			n = ((n & 0xCCCCCCCCCCCCCCCCULL) >> 2) | ((n & 0x3333333333333333ULL) << 2);
+			n = ((n & 0xF0F0F0F0F0F0F0F0ULL) >> 4) | ((n & 0x0F0F0F0F0F0F0F0FULL) << 4);
+			return n;
+		}
 
 	public:
 		ReversiEngine();
@@ -58,7 +64,7 @@ namespace Reversi
 
 		void setState(uint64_t blacks, uint64_t whites, bool blackTurn);
 
-		void swapBW();
+		void swapBW(bool strict = false);
 
 		bool isBlackTurn() const;
 
