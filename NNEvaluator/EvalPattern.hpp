@@ -62,7 +62,10 @@ namespace NNEvaluator
 			auto tpl = maskState2Tuple(engine.getTupleState());
 			if (not evals.contains(tpl))
 			{
-				throw std::invalid_argument("State not found on cache: Eval pattern doesn't cached the given state");
+				//throw std::invalid_argument("State not found on cache: Eval pattern doesn't cached the given state");
+				auto mat = tuple2Matrix(tpl);
+				net.forward(mat, mat);
+				evals[tpl] = *mat.data();
 			}
 			return evals[tpl];
 		}
@@ -70,14 +73,31 @@ namespace NNEvaluator
 		void preCalc()
 		{
 			evals.clear();
-			CMat::Matrix<float>tmp;
-			for (uint32_t b = 0; b < (1 << maskSize); b++) for (uint32_t w = 0; w < (1 << maskSize); w++)
-			{
-				if (b & w) continue;
-				std::tuple<uint64_t, uint64_t>tpl = { b, w };
-				net.forward(tuple2Matrix(tpl), tmp);
-				evals[tpl] = *tmp.data();
-			}
+			return;
+			//const size_t nState = std::pow(3, maskSize);
+			//std::vector<std::tuple<uint64_t, uint64_t>>tpls(nState);
+			//std::vector<float>vec(nState * maskSize);
+			//auto tpl_i = tpls.begin();
+			//auto vec_i = vec.begin();
+			//for (uint32_t b = 0; b < (1u << maskSize); b++) for (uint32_t w = 0; w < (1u << maskSize); w++)
+			//{
+			//	if (b & w) continue;
+			//	std::tuple<uint64_t, uint64_t>tpl = { b, w };
+			//	const auto mat = tuple2Matrix(tpl);
+			//	*tpl_i++ = tpl;
+			//	for (auto mat_i = mat.begin(); mat_i != mat.end();)
+			//	{
+			//		*vec_i++ = *mat_i++;
+			//	}
+			//}
+			//CMat::Matrix<float>tmp{ CMat::MatShape{ static_cast<uint32_t>(tpls.size()), static_cast<uint32_t>(maskSize)}, vec.data() };
+			//net.forward(tmp, tmp);
+			//tpl_i = tpls.begin();
+			//auto val_i = tmp.begin();
+			//while (tpl_i != tpls.end())
+			//{
+			//	evals[*tpl_i++] = *val_i++;
+			//}
 		}
 
 		void forward(const std::tuple<uint64_t, uint64_t, bool>& state, CMat::Matrix<float>& output)

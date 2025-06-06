@@ -44,6 +44,7 @@ private:
 	Array<int32> boardState, legals, subjectiveState;
 	bool isFirstFrame;
 	AsyncTask<Point> playTask;
+	AsyncTask<void> basicTrainTask;
 
 	Statistics gameStats;
 	bool runningStats;
@@ -57,4 +58,5 @@ public:
 	void updatePlayers();
 	void updateUIs();
 	void updateStats();
+	void trainBasic();
 };

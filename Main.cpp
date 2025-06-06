@@ -2,9 +2,11 @@
 # include "Game.hpp"
 # include "CodeExpander.hpp"
 
+# include "include/CMat/CMat.hpp"
 
 void Main()
 {
+
 	Window::Resize(AppData::Width, AppData::Height);
 	Scene::SetBackground(Palette::Lightblue);
 	MyApp app;

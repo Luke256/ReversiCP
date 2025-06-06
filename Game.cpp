@@ -201,10 +201,15 @@ void Game::updateUIs()
 			isFirstFrame = true;
 		}
 	}
-	if (SimpleGUI::Button(U"Reset", { AppData::Width / 2 + 10,10 }, UIW * 2 + 10, not runningStats))
+	if (SimpleGUI::Button(U"Reset Game", { AppData::Width / 2 + 10,10 }, UIW, not runningStats))
 	{
 		reset();
 	}
+	if (SimpleGUI::Button(U"Train Learner", { AppData::Width * 3 / 4 + 5, 10 }, UIW))
+	{
+		trainBasic();
+	}
+
 	if (SimpleGUI::Button(runningStats ? U"Stop Stats" : U"Run Stats", { AppData::Width / 2 + 10, 60 }, UIW))
 	{
 		runningStats = !runningStats;
@@ -240,4 +245,27 @@ void Game::updateStats()
 
 		reset();
 	}
+}
+
+void Game::trainBasic()
+{
+	constexpr auto trainTask = []() {
+		uint64 b = 0;
+		for (int32 i : step(500000))
+		{
+			auto border = Random();
+			uint64 ptr = 1;
+			b = 0;
+			for (auto _ : step(64))
+			{
+				if (CMat::Random::random() < border) b |= ptr;
+				ptr <<= 1;
+			}
+			LearnerAgent::learner.addTarget({ b, ~b, true }, true);
+			LearnerAgent::learner.step(std::popcount(b) * 2 - 64, true);
+		}
+		};
+	if (basicTrainTask.isValid() and not basicTrainTask.isReady()) return;
+
+	basicTrainTask = Async(trainTask);
 }
