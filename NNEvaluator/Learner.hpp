@@ -2,6 +2,7 @@
 
 # include <bit>
 # include <tuple>
+# include <string>
 
 # include "../ReversiEngine.hpp"
 # include "../include/CMat/CMat.hpp"
@@ -17,22 +18,23 @@ namespace NNEvaluator
 	private:
 		using ReversiSummary = std::tuple<uint64_t, uint64_t, bool>;
 		std::vector<EvalPattern> patterns = {
-			{0xff00000000000000},
-			{0x00ff000000000000},
-			{0x0000ff0000000000},
-			{0x000000ff00000000},
-			{0x00000000ff000000},
-			{0x0000000000ff0000},
-			{0x000000000000ff00},
-			{0x00000000000000ff},
+			{0x8040201008040201}, // 左上から右下 8
+			{0x0102040810204080}, // 右上から左下 8
+			{0xf0e0c08000000000}, // 左上周辺 10
+			{0x0f07030100000000}, // 右上周辺 10
+			{0x00000000080c0e0f}, // 左下周辺 10
+			{0x000000000103070f}, // 右下周辺 10
+			{0x0010307000000000}, // 左上中心 6
+			{0x00080c0e00000000}, // 右上中心 6
+			{0x0000000070301000}, // 左下中心 6
+			{0x000000000e0c0800}, // 右下中心 6
 		};
 
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>> integrate;
-		//NNCpp::Modules::Sigmoid<float> sigmoid;
 
 		std::vector<ReversiSummary> stateBufferB, stateBufferW;
 		NNCpp::Modules::MSELoss<float>loss;
-		NNCpp::Optim::SGD<float> optim;
+		NNCpp::Optim::Adam<float> optim;
 
 		// No Cache
 		float forward(const ReversiSummary& state)
@@ -47,14 +49,12 @@ namespace NNEvaluator
 			}
 
 			integrate.forward(pScores, tmp);
-			//sigmoid.forward(tmp, tmp);
 			return *tmp.data();
 		}
 
 		void backward(CMat::Matrix<float>& input)
 		{
 			CMat::Matrix<float>pin;
-			//sigmoid.backward(input, tmp);
 			integrate.backward(input, input);
 			float* ptr = input.data();
 			for (auto& pattern : patterns)
@@ -64,8 +64,17 @@ namespace NNEvaluator
 			}
 		}
 
+
 	public:
 		Learner(): integrate(static_cast<uint32_t>(patterns.size()), 16, 1)
+		{
+			auto p = parameters();
+			optim = NNCpp::Optim::Adam<float>(p, 0.01f);
+
+			preCalsPatterns();
+		}
+
+		inline NNCpp::Utils::ParamInfoList<float> parameters()
 		{
 			NNCpp::Utils::ParamInfoList<float> p;
 			for (auto& pattern : patterns)
@@ -73,9 +82,9 @@ namespace NNEvaluator
 				auto param = pattern.net.parameters();
 				p.insert(p.end(), param.begin(), param.end());
 			}
-			optim = NNCpp::Optim::SGD<float>(p, 0.01f);
-
-			preCalsPatterns();
+			auto i_param = integrate.parameters();
+			p.insert(p.end(), i_param.begin(), i_param.end());
+			return p;
 		}
 
 		int32_t eval(const Reversi::ReversiEngine& engine)
@@ -89,7 +98,7 @@ namespace NNEvaluator
 			}
 
 			integrate.forward(pScores, tmp);
-			//sigmoid.forward(tmp, tmp);
+			//assert(*tmp.data() == forward(engine.getTupleState()));
 			return static_cast<int32_t>(*tmp.data() * 128 - 64);
 		}
 
@@ -99,9 +108,16 @@ namespace NNEvaluator
 			stateBuffer.push_back(state);
 		}
 
+		void clearTarget()
+		{
+			stateBufferB.clear();
+			stateBufferW.clear();
+		}
+
 		/// @brief 今まで登録した盤面のスコアがscoreであるとして学習を行う
 		/// @param score 盤面スコア
-		void step(int32_t score, bool isBlack)
+		/// @param requireRecalc 前計算をもう一度行うか
+		void step(int32_t score, bool isBlack, bool requireRecalc = true)
 		{
 			auto& stateBuffer = isBlack ? stateBufferB : stateBufferW;
 			const auto t = CMat::Matrix<float>{ {1, 1}, score / 128.0f + 0.5f };
@@ -110,19 +126,20 @@ namespace NNEvaluator
 			{
 				--cnt;
 
-				for (int32_t i = 0; i < (cnt ? 1 : 1000); ++i)
+				//for (int32_t i = 0; i < (cnt and stateBuffer.size() > 1 ? 1 : 1000); ++i)
+				for (int32_t i = 0; i < 1; ++i)
 				{
 					auto y = CMat::Matrix<float>{ {1, 1}, forward(state) };
 					float l;
 					loss.forward(y, t, l);
 
-					if (i == 0) Console << U"y: " << *y.data() << U" / t: " << *t.data() << U" / loss:" << l;
+					if (i == 0) Console << U"y: " << *y.data() << U"\tt: " << *t.data() << U"\tloss:" << l;
 
 					optim.zeroGrad();
 					loss.backward(y);
 					backward(y);
 					optim.step();
-					if (l < 0.00001 and cnt == 0)
+					if (l < 0.00001 and cnt == 0 and stateBuffer.size() > 1)
 					{
 						Console << U"Optimized for {} times"_fmt(i + 1);
 						break;
@@ -130,15 +147,34 @@ namespace NNEvaluator
 				}
 			}
 			stateBuffer.clear();
-			preCalsPatterns();
+			if (requireRecalc) preCalsPatterns();
 		}
 
 		void preCalsPatterns()
 		{
+			// 遅いので実際はテーブルのクリアだけ
 			for (auto& pattern : patterns)
 			{
+				//auto start = std::chrono::high_resolution_clock::now();
 				pattern.preCalc();
+				//auto end = std::chrono::high_resolution_clock::now();
+				//auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+				//int a = 10;
 			}
+		}
+
+		/// @brief パラメータをbase64形式の文字列にします
+		/// @return 変換後の文字列
+		std::string dump()
+		{
+			size_t n_params = 0;
+			auto params = parameters();
+			for (const auto& param : params)
+			{
+				n_params += param.size;
+			}
+			Console << U"Model has {} paramters."_fmt(n_params);
+			return "";
 		}
 	};
 }

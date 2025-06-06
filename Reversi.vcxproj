@@ -348,6 +348,7 @@
     <ClInclude Include="include\NNCpp\Modules\SimpleNet.hpp" />
     <ClInclude Include="include\NNCpp\NNCpp.hpp" />
     <ClInclude Include="include\NNCpp\Optimizers.hpp" />
+    <ClInclude Include="include\NNCpp\Optimizers\Adam.hpp" />
     <ClInclude Include="include\NNCpp\Optimizers\Optimizer.hpp" />
     <ClInclude Include="include\NNCpp\Optimizers\SGD.hpp" />
     <ClInclude Include="include\NNCpp\Utils\ParamInfo.hpp" />
