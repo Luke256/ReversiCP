@@ -64,6 +64,39 @@ namespace NNEvaluator
 			}
 		}
 
+		std::string dumpVector(const float* data, const size_t size)
+		{
+
+			std::string result(size * 32 / 6 + 1, '+');
+			// 右から左に並べるイメージで
+			uint64_t buffer = 0;
+			int bufferSize = 0;
+			const float* vEnd = data + size;
+			auto resItr = result.begin();
+			while (bufferSize >= 6 or data < vEnd)
+			{
+				if (bufferSize < 6)
+				{
+					uint64_t intValue = static_cast<uint64_t>(*reinterpret_cast<const uint32_t*>(data++));
+					//cout << "Adding value: " << v[vIdx] << " (binary: " << bitset<32>(intValue) << ")" << endl;
+					buffer |= (intValue << bufferSize);
+					bufferSize += 32;
+				}
+				//cout << "Buffer: " << bitset<64>(buffer) << " (size: " << bufferSize << ")" << endl;
+				*resItr++ = static_cast<char>((buffer & 0x3F) + 59);
+				buffer >>= 6;
+				bufferSize -= 6;
+			}
+
+			if (bufferSize > 0)
+			{
+				//cout << "Buffer: " << bitset<64>(buffer) << " (size: " << bufferSize << ")" << endl;
+				*resItr++ = static_cast<char>((buffer & 0x3F) + 59);
+			}
+
+			return result;
+		}
+
 
 	public:
 		Learner(): integrate(static_cast<uint32_t>(patterns.size()), 16, 1)
@@ -148,6 +181,10 @@ namespace NNEvaluator
 			}
 			stateBuffer.clear();
 			if (requireRecalc) preCalsPatterns();
+			auto d = dump();
+			String s;
+			for (auto c : d) s << c;
+			Console << s;
 		}
 
 		void preCalsPatterns()
@@ -163,18 +200,22 @@ namespace NNEvaluator
 			}
 		}
 
-		/// @brief パラメータをbase64形式の文字列にします
+		/// @brief パラメータをbase64形式-likeの文字列にします
 		/// @return 変換後の文字列
 		std::string dump()
 		{
 			size_t n_params = 0;
 			auto params = parameters();
+			std::string result;
 			for (const auto& param : params)
 			{
 				n_params += param.size;
+
+				result += dumpVector(param.data, param.size);
+				result += '|';
 			}
-			Console << U"Model has {} paramters."_fmt(n_params);
-			return "";
+
+			return result;
 		}
 	};
 }
