@@ -263,6 +263,7 @@ void Game::trainBasic()
 				if (CMat::Random::random() < border) b |= ptr;
 				ptr <<= 1;
 			}
+			
 			LearnerAgent::learner.addTarget({ b, ~b, true }, true);
 			LearnerAgent::learner.step(std::popcount(b) * 2 - 64, true);
 		}

@@ -31,6 +31,7 @@ namespace NNEvaluator
 			{0x000000000e0c0800}, // 右下中心 6
 		};
 
+
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>> integrate;
 
 		std::vector<ReversiSummary> stateBufferB, stateBufferW;
@@ -65,34 +66,47 @@ namespace NNEvaluator
 			}
 		}
 
+		char base64EncodeChar(uint64_t x)
+		{
+			if (x < 26) return static_cast<char>('A' + x);
+			if (x < 52) return static_cast<char>('a' + x - 26);
+			if (x < 62) return static_cast<char>('0' + x - 52);
+			if (x == 62) return '+';
+			if (x == 63) return '/';
+		}
+
+		uint32_t base64DecodeChar(char x)
+		{
+			if (x == '+') return 62;
+			if (x == '/') return 63;
+			if (x < ':') return 52 + x - '0'; // 0-9
+			if (x > '`') return 26 + x - 'a'; // a-z
+			return x - 'A'; // A-Z
+		}
+
 		std::string dumpVector(const float* data, const size_t size)
 		{
-
-			std::string result(size * 32 / 6 + 1, '+');
+			std::string result(size * 32 / 6 + 1, '=');
 			// 右から左に並べるイメージで
 			uint64_t buffer = 0;
-			int bufferSize = 0;
-			const float* vEnd = data + size;
-			auto resItr = result.begin();
-			while (bufferSize >= 6 or data < vEnd)
+			int resIdx = 0, bufferSize = 0;
+			auto endPtr = data + size;
+			while (bufferSize >= 6 or data != endPtr)
 			{
 				if (bufferSize < 6)
 				{
 					uint64_t intValue = static_cast<uint64_t>(*reinterpret_cast<const uint32_t*>(data++));
-					//cout << "Adding value: " << v[vIdx] << " (binary: " << bitset<32>(intValue) << ")" << endl;
 					buffer |= (intValue << bufferSize);
 					bufferSize += 32;
 				}
-				//cout << "Buffer: " << bitset<64>(buffer) << " (size: " << bufferSize << ")" << endl;
-				*resItr++ = static_cast<char>((buffer & 0x3F) + 59);
+				result[resIdx++] = base64EncodeChar(buffer & 0x3F);
 				buffer >>= 6;
 				bufferSize -= 6;
 			}
 
 			if (bufferSize > 0)
 			{
-				//cout << "Buffer: " << bitset<64>(buffer) << " (size: " << bufferSize << ")" << endl;
-				*resItr++ = static_cast<char>((buffer & 0x3F) + 59);
+				result[resIdx++] = base64EncodeChar(buffer & 0x3F);
 			}
 
 			return result;
@@ -200,18 +214,53 @@ namespace NNEvaluator
 		/// @return 変換後の文字列
 		std::string dump()
 		{
-			size_t n_params = 0;
 			auto params = parameters();
-			std::string result;
+			std::string result = "";
 			for (const auto& param : params)
 			{
-				n_params += param.size;
-
 				result += dumpVector(param.data, param.size);
 				result += '|';
 			}
 
 			return result;
+		}
+
+		void load(std::string str)
+		{
+			auto params = parameters();
+			auto pItr = params.begin();
+			auto dPtr = pItr->data;
+			//auto dEnd = pItr->data + pItr->size;
+
+			uint64_t buffer = 0;
+			int bufferSize = 0, cnt = 0;
+			for (char c : str)
+			{
+				if (c == '|')
+				{
+					cnt = 0;
+					buffer = 0;
+					bufferSize = 0;
+					++pItr;
+					if (pItr == params.end()) break;
+					dPtr = pItr->data;
+					continue;
+				}
+				//if (cnt == pItr->size) continue;
+
+				uint64_t value = base64DecodeChar(c);
+				buffer |= (value << bufferSize);
+				bufferSize += 6;
+
+				while (bufferSize >= 32)
+				{
+					uint32_t intValue = static_cast<uint32_t>(buffer & 0xFFFFFFFF);
+					*dPtr++ = *reinterpret_cast<float*>(&intValue);
+					buffer >>= 32;
+					bufferSize -= 32;
+					cnt++;
+				}
+			}
 		}
 	};
 }
