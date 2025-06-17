@@ -13,6 +13,7 @@
 namespace NNEvaluator
 {
 	// 学習・出力機能を持った盤面評価器
+	// 推論は自分が黒であることを前提とする
 	class Learner
 	{
 	private:
@@ -135,9 +136,9 @@ namespace NNEvaluator
 			return static_cast<int32_t>(*tmp.data() * 128 - 64);
 		}
 
-		void addTarget(const ReversiSummary& state, bool isBlack)
+		void addTarget(const ReversiSummary& state, bool isMine)
 		{
-			auto& stateBuffer = isBlack ? stateBufferB : stateBufferW;
+			auto& stateBuffer = isMine ? stateBufferB : stateBufferW;
 			stateBuffer.push_back(state);
 		}
 
@@ -149,42 +150,37 @@ namespace NNEvaluator
 
 		/// @brief 今まで登録した盤面のスコアがscoreであるとして学習を行う
 		/// @param score 盤面スコア
+		/// @param isMine 盤面が自分のものかどうか
 		/// @param requireRecalc 前計算をもう一度行うか
-		void step(int32_t score, bool isBlack, bool requireRecalc = true)
+		void step(int32_t score, bool isMine, bool requireRecalc = true)
 		{
-			auto& stateBuffer = isBlack ? stateBufferB : stateBufferW;
+			auto& stateBuffer = isMine ? stateBufferB : stateBufferW;
 			const auto t = CMat::Matrix<float>{ {1, 1}, score / 128.0f + 0.5f };
-			auto cnt = stateBuffer.size();
+			int idx = 0;
+			optim.zeroGrad();
 			for (const ReversiSummary& state : stateBuffer)
 			{
-				--cnt;
+				auto y = CMat::Matrix<float>{ {1, 1}, forward(state) };
+				float l;
+				loss.forward(y, t, l);
 
-				//for (int32_t i = 0; i < (cnt and stateBuffer.size() > 1 ? 1 : 1000); ++i)
-				for (int32_t i = 0; i < 1; ++i)
+				Console << U"y: {:.10f}\tt: {:.10f}\tloss: {:.10f}"_fmt(*y.data(), *t.data(), l);
+
+				loss.backward(y);
+				backward(y);
+				if ((idx+1) % 8 == 0)
 				{
-					auto y = CMat::Matrix<float>{ {1, 1}, forward(state) };
-					float l;
-					loss.forward(y, t, l);
-
-					if (i == 0) Console << U"y: " << *y.data() << U"\tt: " << *t.data() << U"\tloss:" << l;
-
-					optim.zeroGrad();
-					loss.backward(y);
-					backward(y);
 					optim.step();
-					if (l < 0.00001 and cnt == 0 and stateBuffer.size() > 1)
-					{
-						Console << U"Optimized for {} times"_fmt(i + 1);
-						break;
-					}
+					optim.zeroGrad();
 				}
+
+				idx++;
 			}
+			optim.step();
+			optim.zeroGrad();
+
 			stateBuffer.clear();
 			if (requireRecalc) preCalsPatterns();
-			auto d = dump();
-			String s;
-			for (auto c : d) s << c;
-			Console << s;
 		}
 
 		void preCalsPatterns()

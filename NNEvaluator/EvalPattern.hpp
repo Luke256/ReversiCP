@@ -54,7 +54,7 @@ namespace NNEvaluator
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>>net;
 		std::unordered_map<std::tuple<uint64_t, uint64_t>, float, NNEvaluator::TupleHash> evals;
 
-		EvalPattern(uint64_t mask_) : mask(mask_), maskSize(std::popcount(mask_)), net(std::popcount(mask_), 32, 1)
+		EvalPattern(uint64_t mask_) : mask(mask_), maskSize(std::popcount(mask_)), net(std::popcount(mask_), 16, 1)
 		{}
 
 		float eval(const Reversi::ReversiEngine& engine)

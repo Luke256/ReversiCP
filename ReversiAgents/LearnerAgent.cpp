@@ -12,16 +12,23 @@ LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 {
 	callCnt = 0;
 	Reversi::ReversiEngine env = engine, bestEnv;
-	isBlack = env.isBlackTurn();
+	isBlack = engine.isBlackTurn(); // 自分の色が黒かどうか
 
-	env.swapBW(true); // 相手の盤面を自分のものとしてみる
-	learner.addTarget(env.getTupleState(), not isBlack); // 行動前の盤面を保存
+	// 行動前の盤面の保存と白黒の統一
 	if (isBlack)
 	{
-		env.swapBW(true); // 黒を扱いたい。自分が元々黒なら反転の必要はないので戻す。
+		env.swapBW(true); // 相手盤面(白)を黒にする
+		learner.addTarget(env.getTupleState(), false); // 行動前の盤面を保存
+		env.swapBW(true); // 元に戻す
 	}
+	else
+	{
+		learner.addTarget(env.getTupleState(), false);
+		env.swapBW(true); // 自盤面(白)を黒にする
+	}
+
 	const uint64_t prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
-	const int32_t SEARCH_DEPTH = 3;
+	const int32_t SEARCH_DEPTH = 4;
 
 	int32_t best = -1, score, alpha = -inf, beta = inf, depth;
 	std::vector<LegalState> legals;
@@ -50,9 +57,17 @@ LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 		transTable.swap(transTablePrev);
 		transTable.clear();
 	}
-	learner.addTarget(bestEnv.getTupleState(), isBlack); // 行動後の盤面を保存
-	if (env.isBlackTurn()) return { best & 7, best >> 3 };
-	else return { 7 - (best & 7), best >> 3 };
+	
+	if (isBlack)
+	{
+		learner.addTarget(bestEnv.getTupleState(), true); // 行動後の盤面を保存
+		return { best & 7, best >> 3 };
+	}
+	else
+	{
+		learner.addTarget(bestEnv.getTupleState(), true); // 行動後の盤面を保存
+		return { 7 - (best & 7), best >> 3 };
+	}
 }
 
 void LearnerAgent::reset_child()
@@ -63,9 +78,17 @@ void LearnerAgent::reviewGame(const Reversi::ReversiEngine& engine)
 {
 	Reversi::ReversiEngine env = engine;
 	assert(env.isBlackTurn() == isBlack);
-	if (not isBlack) env.swapBW(); // 黒を扱いたい
-	learner.step(env.getNBlacks() - env.getNWhites(), isBlack, false); // 自盤面の学習
-	learner.step(env.getNWhites() - env.getNBlacks(), not isBlack); // 相手盤面の学習
+	if (isBlack)
+	{
+		learner.step(env.getNBlacks() - env.getNWhites(), true, false);
+		learner.step(env.getNWhites() - env.getNBlacks(), false, true);
+	}
+	else
+	{
+		env.swapBW(true);
+		learner.step(env.getNBlacks() - env.getNWhites(), false, false);
+		learner.step(env.getNWhites() - env.getNBlacks(), true, true);
+	}
 }
 
 int32_t LearnerAgent::negaAlpha(Reversi::ReversiEngine& engine, int32_t depth, bool passed, int32_t alpha, int32_t beta)
