@@ -251,8 +251,10 @@ void Game::trainBasic()
 {
 	constexpr auto trainTask = []() {
 		uint64 b = 0;
-		for (int32 i : step(500000))
+		const int32 n_steps = 20000;
+		for (int32 i : step(n_steps))
 		{
+			Console << U"== Basic training {} / {} =="_fmt(i, n_steps);
 			auto border = Random();
 			uint64 ptr = 1;
 			b = 0;
