@@ -59,4 +59,6 @@ public:
 	void updateUIs();
 	void updateStats();
 	void trainBasic();
+	String dumpModel();
+	void updateKeys();
 };

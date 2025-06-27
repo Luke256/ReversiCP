@@ -44,6 +44,8 @@ Game::~Game()
 
 void Game::update()
 {
+	ClearPrint();
+
 	// players
 	updatePlayers();
 
@@ -55,6 +57,9 @@ void Game::update()
 	{
 		updateStats();
 	}
+
+	// KeyUpdates
+	updateKeys();
 }
 
 void Game::draw() const
@@ -251,10 +256,10 @@ void Game::trainBasic()
 {
 	constexpr auto trainTask = []() {
 		uint64 b = 0;
-		const int32 n_steps = 20000;
+		const int32 n_steps = 200000;
 		for (int32 i : step(n_steps))
 		{
-			Console << U"== Basic training {} / {} =="_fmt(i, n_steps);
+			Print << U"== Basic training {} / {} =="_fmt(i, n_steps);
 			auto border = Random();
 			uint64 ptr = 1;
 			b = 0;
@@ -271,4 +276,36 @@ void Game::trainBasic()
 	if (basicTrainTask.isValid() and not basicTrainTask.isReady()) return;
 
 	basicTrainTask = Async(trainTask);
+}
+
+String Game::dumpModel()
+{
+	auto dumped = LearnerAgent::learner.dump();
+	String s;
+	for (auto c : dumped) s << c;
+	const DateTime t = DateTime::Now();
+	TextWriter writer{ U"dumps/{}.ldump"_fmt(t.format(U"yyyy-MM-dd-HHmmss")) };
+	writer.write(s);
+	return writer.path();
+}
+
+void Game::updateKeys()
+{
+	if (KeyF9.down())
+	{
+		String path = dumpModel();
+		System::MessageBoxOK(U"{} に保存しました"_fmt(path));
+	}
+	if (KeyF10.down())
+	{
+		Optional<FilePath> path = Dialog::OpenFile({ {U"savefile", {U"ldump"}} }, FileSystem::CurrentDirectory());
+		if (path)
+		{
+			TextReader reader(*path);
+			String data = *reader.readLine();
+			std::string str;
+			for (auto c : data) str.push_back(c);
+			LearnerAgent::learner.load(str);
+		}
+	}
 }

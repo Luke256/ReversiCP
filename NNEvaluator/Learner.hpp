@@ -117,7 +117,7 @@ namespace NNEvaluator
 		Learner(): integrate(static_cast<uint32_t>(patterns.size()), 16, 1)
 		{
 			auto p = parameters();
-			optim = NNCpp::Optim::Adam<float>(p, 0.01f);
+			optim = NNCpp::Optim::Adam<float>(p, 1e-5);
 
 			preCalsPatterns();
 		}
@@ -180,6 +180,7 @@ namespace NNEvaluator
 				loss.forward(y, t_, l);
 
 				Console << U"y: {:.10f}\tt: {:.10f}\tloss: {:.10f}"_fmt(*y.data(), *t_.data(), l);
+
 
 				loss.backward(y);
 				backward(y);
