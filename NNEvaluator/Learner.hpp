@@ -165,7 +165,7 @@ namespace NNEvaluator
 		/// @param score 盤面スコア
 		/// @param isMine 盤面が自分のものかどうか
 		/// @param requireRecalc 前計算をもう一度行うか
-		void step(int32_t score, bool isMine, bool requireRecalc = true)
+		void step(int32_t score, bool isMine, bool requireRecalc = true, bool adjust = false)
 		{
 			auto& stateBuffer = isMine ? stateBufferB : stateBufferW;
 			const auto t = CMat::Matrix<float>{ {1, 1}, score / 128.0f + 0.5f };
@@ -174,10 +174,12 @@ namespace NNEvaluator
 			for (const ReversiSummary& state : stateBuffer)
 			{
 				auto y = CMat::Matrix<float>{ {1, 1}, forward(state) };
+				auto t_ = t;
+				if (adjust) *t_.data() = (idx * *t_.data() + (59 - idx) * *y.data()) / 59.0f;
 				float l;
-				loss.forward(y, t, l);
+				loss.forward(y, t_, l);
 
-				Console << U"y: {:.10f}\tt: {:.10f}\tloss: {:.10f}"_fmt(*y.data(), *t.data(), l);
+				Console << U"y: {:.10f}\tt: {:.10f}\tloss: {:.10f}"_fmt(*y.data(), *t_.data(), l);
 
 				loss.backward(y);
 				backward(y);

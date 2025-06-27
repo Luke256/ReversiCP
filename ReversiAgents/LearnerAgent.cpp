@@ -80,14 +80,14 @@ void LearnerAgent::reviewGame(const Reversi::ReversiEngine& engine)
 	assert(env.isBlackTurn() == isBlack);
 	if (isBlack)
 	{
-		learner.step(env.getNBlacks() - env.getNWhites(), true, false);
-		learner.step(env.getNWhites() - env.getNBlacks(), false, true);
+		learner.step(env.getNBlacks() - env.getNWhites(), true, false, true);
+		learner.step(env.getNWhites() - env.getNBlacks(), false, true, true);
 	}
 	else
 	{
 		env.swapBW(true);
-		learner.step(env.getNBlacks() - env.getNWhites(), false, false);
-		learner.step(env.getNWhites() - env.getNBlacks(), true, true);
+		learner.step(env.getNBlacks() - env.getNWhites(), false, false, true);
+		learner.step(env.getNWhites() - env.getNBlacks(), true, true, true);
 	}
 }
 
