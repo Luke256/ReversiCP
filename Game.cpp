@@ -256,7 +256,7 @@ void Game::trainBasic()
 {
 	constexpr auto trainTask = []() {
 		uint64 b = 0;
-		const int32 n_steps = 200000;
+		const int32 n_steps = 1000000;
 		for (int32 i : step(n_steps))
 		{
 			Print << U"== Basic training {} / {} =="_fmt(i, n_steps);
@@ -272,6 +272,7 @@ void Game::trainBasic()
 			LearnerAgent::learner.addTarget({ b, ~b, true }, true);
 			LearnerAgent::learner.step(std::popcount(b) * 2 - 64, true);
 		}
+		Console << U"{} steps of basic train finished."_fmt(n_steps);
 		};
 	if (basicTrainTask.isValid() and not basicTrainTask.isReady()) return;
 

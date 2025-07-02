@@ -53,7 +53,7 @@ namespace NNCpp::Optim
 				{
 					*v_ptr = m_beta1 * (*v_ptr) + (1 - m_beta1) * (*gptr);
 					*s_ptr = m_beta2 * (*s_ptr) + (1 - m_beta2) * (*gptr) * (*gptr);
-					*dptr -= m_lr * *v_ptr * std::exp(-0.5 * std::log(1e-6 + *s_ptr));
+					*dptr -= static_cast<_Dty>(m_lr * *v_ptr * std::exp(-0.5 * std::log(1e-6 + *s_ptr)));
 
 					dptr++;
 					gptr++;

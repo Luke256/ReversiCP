@@ -30,7 +30,7 @@ namespace NNEvaluator
 			{0x0000000070703000}, // 左下中心 8
 			{0x00000000e0e0c000}, // 右下中心 8
 		};
-
+		const int directFeaturesN = 1;
 
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>> integrate;
 
@@ -38,10 +38,18 @@ namespace NNEvaluator
 		NNCpp::Modules::MSELoss<float>loss;
 		NNCpp::Optim::Adam<float> optim;
 
+		void addFeaturesLegalsN(const ReversiSummary& state, float* &targetPtr)
+		{
+			Reversi::ReversiEngine engine;
+			engine.setState(std::get<0>(state), std::get<1>(state), std::get<2>(state));
+
+			*targetPtr++ = std::popcount(engine.getLegals()) / 32.0f;
+		}
+
 		// No Cache
 		float forward(const ReversiSummary& state)
 		{
-			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size()) });
+			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size() + directFeaturesN) });
 			float* targetPtr = pScores.data();
 			CMat::Matrix<float> tmp;
 			for (auto& pattern : patterns)
@@ -50,6 +58,7 @@ namespace NNEvaluator
 				*targetPtr++ = *tmp.data();
 			}
 
+			addFeaturesLegalsN(state, targetPtr);
 			integrate.forward(pScores, tmp);
 			return *tmp.data();
 		}
@@ -73,6 +82,7 @@ namespace NNEvaluator
 			if (x < 62) return static_cast<char>('0' + x - 52);
 			if (x == 62) return '+';
 			if (x == 63) return '/';
+			return '?';
 		}
 
 		uint32_t base64DecodeChar(char x)
@@ -114,7 +124,7 @@ namespace NNEvaluator
 
 
 	public:
-		Learner(): integrate(static_cast<uint32_t>(patterns.size()), 16, 1)
+		Learner(): integrate(static_cast<uint32_t>(patterns.size()) + directFeaturesN, 16, 1)
 		{
 			auto p = parameters();
 			optim = NNCpp::Optim::Adam<float>(p, 1e-5);
@@ -137,7 +147,7 @@ namespace NNEvaluator
 
 		int32_t eval(const Reversi::ReversiEngine& engine)
 		{
-			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size()) });
+			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size() + directFeaturesN) });
 			float* targetPtr = pScores.data();
 			CMat::Matrix<float> tmp;
 			for (auto& pattern : patterns)
@@ -145,6 +155,7 @@ namespace NNEvaluator
 				*targetPtr++ = pattern.eval(engine);
 			}
 
+			addFeaturesLegalsN(engine.getTupleState(), targetPtr);
 			integrate.forward(pScores, tmp);
 			return static_cast<int32_t>(*tmp.data() * 128 - 64);
 		}
