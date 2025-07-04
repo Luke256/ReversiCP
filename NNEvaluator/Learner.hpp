@@ -30,7 +30,7 @@ namespace NNEvaluator
 			{0x0000000070703000}, // 左下中心 8
 			{0x00000000e0e0c000}, // 右下中心 8
 		};
-		const int directFeaturesN = 1;
+		const int directFeaturesN = 2;
 
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>> integrate;
 
@@ -41,9 +41,11 @@ namespace NNEvaluator
 		void addFeaturesLegalsN(const ReversiSummary& state, float* &targetPtr)
 		{
 			Reversi::ReversiEngine engine;
-			engine.setState(std::get<0>(state), std::get<1>(state), std::get<2>(state));
+			engine.setState(std::get<0>(state), std::get<1>(state), true);
 
-			*targetPtr++ = std::popcount(engine.getLegals()) / 32.0f;
+			*targetPtr++ = std::popcount(engine.getLegals()) / 32.0f; // 黒=自分視点での着手可能数
+			engine.pass();
+			*targetPtr++ = std::popcount(engine.getLegals()) / 32.0f; // 白=相手視点での着手可能数
 		}
 
 		// No Cache
