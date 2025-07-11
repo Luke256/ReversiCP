@@ -22,13 +22,10 @@ namespace NNEvaluator
 			{0x8040201008040201}, // 左上から右下 8
 			{0x0102040810204080}, // 右上から左下 8
 			{0xf0c0808000000000}, // 左上周辺 8
-			{0x0f03010100000000}, // 右上周辺 8
-			{0x000000008080c0f0}, // 左下周辺 8
-			{0x000000000101030f}, // 右下周辺 8
 			{0x0030707000000000}, // 左上中心 8
-			{0x000c0e0e00000000}, // 右上中心 8
-			{0x0000000070703000}, // 左下中心 8
-			{0x00000000e0e0c000}, // 右下中心 8
+			{0xff42000000000000}, // 辺と角
+			{0xe0e0e00000000000}, // 隅
+
 		};
 		const int directFeaturesN = 3;
 
@@ -56,13 +53,16 @@ namespace NNEvaluator
 		// No Cache
 		float forward(const ReversiSummary& state)
 		{
-			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size() + directFeaturesN) });
+			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size() * 4 + directFeaturesN) });
 			float* targetPtr = pScores.data();
 			CMat::Matrix<float> tmp;
 			for (auto& pattern : patterns)
 			{
 				pattern.forward(state, tmp);
-				*targetPtr++ = *tmp.data();
+				*targetPtr++ = tmp.data()[0];
+				*targetPtr++ = tmp.data()[1];
+				*targetPtr++ = tmp.data()[2];
+				*targetPtr++ = tmp.data()[3];
 			}
 
 			addFeaturesLegalsN(state, targetPtr);
@@ -78,7 +78,7 @@ namespace NNEvaluator
 			float* ptr = input.data();
 			for (auto& pattern : patterns)
 			{
-				pin = CMat::Matrix<float>({ 1, 1 }, *ptr++);
+				pin = CMat::Matrix<float>({ 4, 1 }, *ptr++);
 				pattern.net.backward(pin, pin);
 			}
 		}
@@ -132,7 +132,7 @@ namespace NNEvaluator
 
 
 	public:
-		Learner(): integrate(static_cast<uint32_t>(patterns.size()) + directFeaturesN, 16, 1)
+		Learner(): integrate(static_cast<uint32_t>(patterns.size()) * 4 + directFeaturesN, 16, 1)
 		{
 			auto p = parameters();
 			optim = NNCpp::Optim::Adam<float>(p, 1e-6);
@@ -155,12 +155,17 @@ namespace NNEvaluator
 
 		int32_t eval(const Reversi::ReversiEngine& engine)
 		{
-			CMat::Matrix<float>pScores(CMat::MatShape{ 1, static_cast<uint32_t>(patterns.size() + directFeaturesN) });
+			CMat::Matrix<float>pScores(CMat::MatShape{ 4, static_cast<uint32_t>(patterns.size() * 4 + directFeaturesN) });
 			float* targetPtr = pScores.data();
 			CMat::Matrix<float> tmp;
 			for (auto& pattern : patterns)
 			{
-				*targetPtr++ = pattern.eval(engine);
+				float ptr[4];
+				pattern.eval(engine, ptr);
+				*targetPtr++ = ptr[0];
+				*targetPtr++ = ptr[1];
+				*targetPtr++ = ptr[2];
+				*targetPtr++ = ptr[3];
 			}
 
 			addFeaturesLegalsN(engine.getTupleState(), targetPtr);

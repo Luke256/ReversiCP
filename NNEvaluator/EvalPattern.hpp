@@ -8,6 +8,7 @@
 # include "../include/NNCpp/NNCpp.hpp"
 # include "../include/CMat/CMat.hpp"
 # include "../ReversiEngine.hpp"
+# include "../Utils.hpp"
 
 namespace NNEvaluator
 {
@@ -57,47 +58,26 @@ namespace NNEvaluator
 		EvalPattern(uint64_t mask_) : mask(mask_), maskSize(std::popcount(mask_)), net(std::popcount(mask_), 16, 1)
 		{}
 
-		float eval(const Reversi::ReversiEngine& engine)
+		void eval(const Reversi::ReversiEngine& engine, float *res)
 		{
-			auto tpl = maskState2Tuple(engine.getTupleState());
-			if (not evals.contains(tpl))
+			for (int i = 0; i < 1; i++, mask = BitBordUtils::rotateClockwise90(mask))
 			{
-				//throw std::invalid_argument("State not found on cache: Eval pattern doesn't cached the given state");
-				auto mat = tuple2Matrix(tpl);
-				net.forward(mat, mat);
-				evals[tpl] = *mat.data();
+				auto tpl = maskState2Tuple(engine.getTupleState());
+				if (not evals.contains(tpl))
+				{
+					auto mat = tuple2Matrix(tpl);
+					net.forward(mat, mat);
+					auto v = *mat.data();
+					evals[tpl] = v;
+				}
+				res[i] = evals[tpl];
 			}
-			return evals[tpl];
 		}
 
 		void preCalc()
 		{
 			evals.clear();
 			return;
-			//const size_t nState = std::pow(3, maskSize);
-			//std::vector<std::tuple<uint64_t, uint64_t>>tpls(nState);
-			//std::vector<float>vec(nState * maskSize);
-			//auto tpl_i = tpls.begin();
-			//auto vec_i = vec.begin();
-			//for (uint32_t b = 0; b < (1u << maskSize); b++) for (uint32_t w = 0; w < (1u << maskSize); w++)
-			//{
-			//	if (b & w) continue;
-			//	std::tuple<uint64_t, uint64_t>tpl = { b, w };
-			//	const auto mat = tuple2Matrix(tpl);
-			//	*tpl_i++ = tpl;
-			//	for (auto mat_i = mat.begin(); mat_i != mat.end();)
-			//	{
-			//		*vec_i++ = *mat_i++;
-			//	}
-			//}
-			//CMat::Matrix<float>tmp{ CMat::MatShape{ static_cast<uint32_t>(tpls.size()), static_cast<uint32_t>(maskSize)}, vec.data() };
-			//net.forward(tmp, tmp);
-			//tpl_i = tpls.begin();
-			//auto val_i = tmp.begin();
-			//while (tpl_i != tpls.end())
-			//{
-			//	evals[*tpl_i++] = *val_i++;
-			//}
 		}
 
 		void forward(const std::tuple<uint64_t, uint64_t, bool>& state, CMat::Matrix<float>& output)
@@ -107,20 +87,23 @@ namespace NNEvaluator
 
 		CMat::Matrix<float> maskState2Matrix(const std::tuple<uint64_t, uint64_t, bool>& state)
 		{
-			CMat::Matrix<float>res{ CMat::MatShape{1, static_cast<uint32_t>(std::popcount(mask))} };
+			CMat::Matrix<float>res{ CMat::MatShape{4, static_cast<uint32_t>(std::popcount(mask))} };
 			float* ptr = res.data();
-			uint64_t pointer = 0x8000000000000000;
-			for (; pointer; pointer >>= 1)
+			for (int i = 0; i < 4; i++, mask = BitBordUtils::rotateClockwise90(mask))
 			{
-				if ((mask & pointer) == 0) continue;
-				if (std::get<0>(state) & pointer) *ptr = 1.0f;
-				else if (std::get<1>(state) & pointer) *ptr = -1.0f;
-				ptr++;
+				uint64_t pointer = 0x8000000000000000;
+				for (; pointer; pointer >>= 1)
+				{
+					if ((mask & pointer) == 0) continue;
+					if (std::get<0>(state) & pointer) *ptr = 1.0f;
+					else if (std::get<1>(state) & pointer) *ptr = -1.0f;
+					ptr++;
+				}
 			}
 			return res;
 		}
 
-		std::tuple<uint64_t, uint64_t> maskState2Tuple(const std::tuple<uint64_t, uint64_t, bool>& state)
+		std::tuple<uint64_t, uint64_t> maskState2Tuple(const std::tuple<uint64_t, uint64_t, bool>& state) const
 		{
 			std::tuple<uint64_t, uint64_t> res;
 			uint64_t ptr = (1ull << (maskSize - 1));

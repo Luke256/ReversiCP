@@ -950,5 +950,8 @@
     <ClInclude Include="include\NNCpp\Optimizers\Adam.hpp">
       <Filter>include\NNCpp\Optimizers</Filter>
     </ClInclude>
+    <ClInclude Include="Utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

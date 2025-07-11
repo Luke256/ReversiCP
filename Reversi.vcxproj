@@ -364,6 +364,7 @@
     <ClInclude Include="ReversiAgents\RandomAgent.hpp" />
     <ClInclude Include="ReversiEngine.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Utils.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App\example\obj\blacksmith.obj">
