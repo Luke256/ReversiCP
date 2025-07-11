@@ -30,7 +30,7 @@ namespace NNEvaluator
 			{0x0000000070703000}, // 左下中心 8
 			{0x00000000e0e0c000}, // 右下中心 8
 		};
-		const int directFeaturesN = 2;
+		const int directFeaturesN = 3;
 
 		NNCpp::Modules::SimpleNet<float, NNCpp::Modules::ReLU<float>> integrate;
 
@@ -48,6 +48,11 @@ namespace NNEvaluator
 			*targetPtr++ = std::popcount(engine.getLegals()) / 32.0f; // 白=相手視点での着手可能数
 		}
 
+		void addFeaturesSimpleScore(const ReversiSummary& state, float*& targetPtr)
+		{
+			*targetPtr++ = (std::popcount(std::get<0>(state)) - std::popcount(std::get<1>(state))) / 64.0f;
+		}
+
 		// No Cache
 		float forward(const ReversiSummary& state)
 		{
@@ -61,6 +66,7 @@ namespace NNEvaluator
 			}
 
 			addFeaturesLegalsN(state, targetPtr);
+			addFeaturesSimpleScore(state, targetPtr);
 			integrate.forward(pScores, tmp);
 			return *tmp.data();
 		}
@@ -129,7 +135,7 @@ namespace NNEvaluator
 		Learner(): integrate(static_cast<uint32_t>(patterns.size()) + directFeaturesN, 16, 1)
 		{
 			auto p = parameters();
-			optim = NNCpp::Optim::Adam<float>(p, 1e-5);
+			optim = NNCpp::Optim::Adam<float>(p, 1e-6);
 
 			preCalsPatterns();
 		}

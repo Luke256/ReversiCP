@@ -72,6 +72,8 @@ private:
 
 	inline int32_t eval(const Reversi::ReversiEngine& engine);
 
+	inline int32_t evalTablic(const Reversi::ReversiEngine& engine) const;
+
 	/// @brief 合法手をざっとした評価の高い順に並べて返します
 	/// @param engine リバーシエンジン
 	/// @param legalList 適当なリスト (スコア, 手)
@@ -101,7 +103,7 @@ private:
 			}
 			else
 			{
-				legalList[idx++] = { -eval(engine), i };
+				legalList[idx++] = { -evalTablic(engine), i };
 			}
 
 			engine.setState(prevBlacks, prevWhites, prevTurn);

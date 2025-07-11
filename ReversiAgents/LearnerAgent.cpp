@@ -28,7 +28,7 @@ LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 	}
 
 	const uint64_t prevBlacks = env.getBlacks(), prevWhites = env.getWhites();
-	const int32_t SEARCH_DEPTH = 3;
+	const int32_t SEARCH_DEPTH = 4;
 
 	int32_t best = -1, score, alpha = -inf, beta = inf, depth;
 	std::vector<LegalState> legals;
@@ -128,4 +128,40 @@ int32_t LearnerAgent::negaAlpha(Reversi::ReversiEngine& engine, int32_t depth, b
 inline int32_t LearnerAgent::eval(const Reversi::ReversiEngine& engine)
 {
 	return learner.eval(engine);
+}
+
+
+inline int32_t LearnerAgent::evalTablic(const Reversi::ReversiEngine& engine) const
+{
+	uint64_t black = engine.getBlacks(), white = engine.getWhites();
+	int32_t score = 0;
+	score += rowValues[(0 << 8) + ((black & 0xFF00000000000000) >> 56)];
+	score += rowValues[(1 << 8) + ((black & 0x00FF000000000000) >> 48)];
+	score += rowValues[(2 << 8) + ((black & 0x0000FF0000000000) >> 40)];
+	score += rowValues[(3 << 8) + ((black & 0x000000FF00000000) >> 32)];
+	score += rowValues[(4 << 8) + ((black & 0x00000000FF000000) >> 24)];
+	score += rowValues[(5 << 8) + ((black & 0x0000000000FF0000) >> 16)];
+	score += rowValues[(6 << 8) + ((black & 0x000000000000FF00) >> 8)];
+	score += rowValues[(7 << 8) + ((black & 0x00000000000000FF))];
+	score -= rowValues[(0 << 8) + ((white & 0xFF00000000000000) >> 56)];
+	score -= rowValues[(1 << 8) + ((white & 0x00FF000000000000) >> 48)];
+	score -= rowValues[(2 << 8) + ((white & 0x0000FF0000000000) >> 40)];
+	score -= rowValues[(3 << 8) + ((white & 0x000000FF00000000) >> 32)];
+	score -= rowValues[(4 << 8) + ((white & 0x00000000FF000000) >> 24)];
+	score -= rowValues[(5 << 8) + ((white & 0x0000000000FF0000) >> 16)];
+	score -= rowValues[(6 << 8) + ((white & 0x000000000000FF00) >> 8)];
+	score -= rowValues[(7 << 8) + ((white & 0x00000000000000FF))];
+
+	if (not engine.isBlackTurn()) score = -score;
+	if (score > 0) // 四捨五入のため
+		score += 128;
+	else
+		score -= 128;
+	score /= 256; // 生の評価値は最終石差の256倍なので、256で割る
+	if (score > 64) score = 64; // 評価値を[-64, 64] に収める
+	else if (score < -64) score = -64;
+
+	score += std::popcount(engine.getLegals());
+
+	return score;
 }
