@@ -57,6 +57,7 @@ LearnerAgent::Pos LearnerAgent::play(const Reversi::ReversiEngine& engine)
 		transTable.swap(transTablePrev);
 		transTable.clear();
 	}
+	Console << best;
 	
 	if (isBlack)
 	{
